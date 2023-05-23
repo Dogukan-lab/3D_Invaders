@@ -1,0 +1,3 @@
+D:/githubrepos/3D_Invaders/out/build/x86-release/CMakeFiles/CMakeScratch/TryCompile-vjm1xb/CMakeFiles/cmTC_bafa4.dir
+D:/githubrepos/3D_Invaders/out/build/x86-release/CMakeFiles/CMakeScratch/TryCompile-vjm1xb/CMakeFiles/edit_cache.dir
+D:/githubrepos/3D_Invaders/out/build/x86-release/CMakeFiles/CMakeScratch/TryCompile-vjm1xb/CMakeFiles/rebuild_cache.dir
