@@ -1,5 +1,8 @@
 ﻿#include <glad/gl.h>
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <../imgui/include/imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
 #include "glm/ext.hpp"
 #include <iostream>
@@ -46,7 +49,10 @@ int main(void)
         std::cout << "Failed to initialize glad interface!" << std::endl;
         return -1;
     }
-    
+
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window, false);
+    ImGui_ImplOpenGL3_Init();
     tigl::init();
     init();
 
@@ -133,7 +139,34 @@ void init() {
 
 double lastTime = 0.0;
 
+//TODO Maak de ImGUI setup in een aparte klasse.
+//TODO Optimaliseer waar nodig is in de cmake :)
+//Imgui stuff is heel vergelijkbaar met de tigl shader, hou rekening hiermee
+//TODO Entity moet een id hebben en kunnen bijhouden wat voor signatuur het heeft qua componenten.
+//De reden daarvoor is voornamelijk dat de systems alleen 1 check hoeven te doen ipv constant/per update.
+//TODO Maak een mesh component, deze houd voor nu alleen een VBO bij.
+//TODO maak een object loader.
+//TODO maak de object loader zodanig dat het een vbo altijd terug geeft voor de mesh.
+//TODO Textures!
+//TODO Belichting uitvogelen!
+//TODO cry.
+//TODO Maak een eerste systeem waarbij het ECS in z'n geheel wordt getest.
 void update() {
+    //IMGUI dingen
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    //Ui dingetjes hiero
+    ImGui::Begin("Buncha stuff");
+
+    ImGui::Begin("");
+
+    ImGui::End();
+
+
+
+
     //Hier ECS dingen testen
     double currentFrame = glfwGetTime();
     float deltaTime = float(currentFrame - lastTime);
@@ -156,11 +189,14 @@ void draw() {
     tigl::shader->setViewMatrix(fpscam->getMatrix());
     tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
-    glm::mat4 model;
+    //glm::mat4 model;
 
     //model = glm::rotate(model, 10.f, glm::vec3(0, 1, 0));
     //tigl::shader->setModelMatrix(glm::mat4(1.0f));
     tigl::shader->enableColor(true);
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     tigl::drawVertices(GL_QUADS, cubeVBO);
     tigl::shader->enableColor(false); 

@@ -19,11 +19,12 @@ endif ()
 include_directories(lib/glad/include) 
 include_directories(lib/tigl/include)
 include_directories(lib/glm)
+include_directories(lib/imgui/include)
 
 add_subdirectory(lib/glm)
 add_subdirectory(lib/tigl)
 add_subdirectory(lib/glad)
-
+add_subdirectory(lib/imgui)
 link_directories(lib/glm)
 
 add_library(glfw STATIC IMPORTED) 
@@ -39,6 +40,6 @@ endif()
 target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW_INCLUDE_DIR})
 
 target_link_libraries(${PROJECT_NAME} glfw opengl32)
-target_link_libraries(${PROJECT_NAME} glad tigl glm)
+target_link_libraries(${PROJECT_NAME} glad tigl glm IMGUI)
 
 # TODO: Add tests and install targets if needed.
