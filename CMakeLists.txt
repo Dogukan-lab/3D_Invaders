@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.8)
 project ("3D_invaders")
 
 
@@ -30,7 +30,7 @@ add_library(glfw STATIC IMPORTED)
 set_target_properties(glfw PROPERTIES IMPORTED_LOCATION ${GLFW_LIB})
 
 # Add source to this project's executable.
-add_executable (${PROJECT_NAME} "src/3D_invaders.cpp" "src/3D_invaders.h" "src/ECS/include/Entity.h" "src/ECS/components/Component.h" "src/ECS/components/Transform.h"  "src/ECS/EntityManager.h")
+add_executable (${PROJECT_NAME} "src/3D_invaders.cpp"  "src/ECS/include/Entity.h" "src/ECS/components/Component.h" "src/ECS/components/Transform.h"  "src/ECS/EntityManager.h" "src/camera/fpsCam.cpp" "src/camera/fpsCam.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET 3D_invaders PROPERTY CXX_STANDARD 17)
