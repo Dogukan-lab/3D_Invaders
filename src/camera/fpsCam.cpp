@@ -14,9 +14,9 @@ glm::mat4 FPSCam::getMatrix() {
     return ret;
 }
 
-void FPSCam::update_cam(GLFWwindow* window, float deltaTime) {
+void FPSCam::update_cam(float deltaTime) {
     double x, y;
-    glfwGetCursorPos(window, &x, &y);
+    glfwGetCursorPos(this->currentWindow, &x, &y);
 
     static double lastX = x;
     static double lastY = y;
@@ -28,13 +28,13 @@ void FPSCam::update_cam(GLFWwindow* window, float deltaTime) {
     lastY = y;
 
 
-    if (glfwGetKey(window, GLFW_KEY_W))
+    if (glfwGetKey(this->currentWindow, GLFW_KEY_W))
         move(90, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S))
+    if (glfwGetKey(this->currentWindow, GLFW_KEY_S))
         move(-90, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D))
+    if (glfwGetKey(this->currentWindow, GLFW_KEY_D))
         move(180, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A))
+    if (glfwGetKey(this->currentWindow, GLFW_KEY_A))
         move(0, deltaTime);
 }
 
@@ -46,6 +46,7 @@ void FPSCam::move(float angle, float vac) {
 }
 
 FPSCam::FPSCam(GLFWwindow* window) {
+    this->currentWindow = window;
     glfwSetInputMode(window, GLFW_HAND_CURSOR, GLFW_CURSOR_DISABLED);
     if (glfwRawMouseMotionSupported())
         glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);

@@ -7,13 +7,15 @@ struct GLFWwindow;
 
 class FPSCam {
 public:
-    FPSCam(GLFWwindow*);
+    FPSCam(GLFWwindow* window);
 
     glm::mat4 getMatrix();
-    void update_cam(GLFWwindow*, float deltaTime);
+    void update_cam(float deltaTime);
 
 private:
     glm::vec3 position = glm::vec3(0.f);
     glm::vec2 rotation = glm::vec2(0.f);
     void move(float angle, float vac);
+
+    GLFWwindow* currentWindow;
 }; 

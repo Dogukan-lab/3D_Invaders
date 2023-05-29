@@ -10,8 +10,10 @@
 #include "camera/fpsCam.h"
 #include "ECS/EntityManager.h"
 #include "ECS/components/Transform.h"
+#include "window/Window.h"
 
-GLFWwindow* window;
+GLFWwindow* glfwWindow;
+std::unique_ptr<Window> controlPanel = std::make_unique<Window>();
 FPSCam* fpscam;
 EntityManager* manager;
 
@@ -36,47 +38,44 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(windowWidth, windowHeight, "Why are you reading this?!??!", NULL, NULL);
-    if (!window)
+    glfwWindow = glfwCreateWindow(windowWidth, windowHeight, "Why are you reading this?!??!", NULL, NULL);
+    if (!glfwWindow)
     {
         glfwTerminate();
         return -1;
     }
 
     /* Make the window's context current */
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(glfwWindow);
     if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize glad interface!" << std::endl;
         return -1;
     }
 
-    ImGui::CreateContext();
-    ImGui_ImplGlfw_InitForOpenGL(window, false);
-    ImGui_ImplOpenGL3_Init();
     tigl::init();
     init();
 
-    glEnable(GL_DEPTH_TEST);
 
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(glfwWindow))
     {
         /* Render here */
         update();
         draw();
         /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(glfwWindow);
 
         /* Poll for and process events */
         glfwPollEvents();
     }
-
+    controlPanel->ShutDown();
     glfwTerminate();
     return 0;
 }
 
 void init() {
-    glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+    controlPanel->Init(glfwWindow);
+    glfwSetKeyCallback(glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
         if (key == GLFW_KEY_ESCAPE)
             glfwSetWindowShouldClose(window, 1);
 
@@ -85,8 +84,8 @@ void init() {
 
         });
 
-    fpscam = new FPSCam(window);
-    manager = new EntityManager();
+    fpscam = new FPSCam(glfwWindow);
+    //manager = new EntityManager();
 
     //auto entity = manager->addEntity<Entity>();
 
@@ -134,14 +133,13 @@ void init() {
     };
 
     cubeVBO = tigl::createVbo(vertices);
+    glEnable(GL_DEPTH_TEST);
 
 }
 
 double lastTime = 0.0;
 
-//TODO Maak de ImGUI setup in een aparte klasse.
 //TODO Optimaliseer waar nodig is in de cmake :)
-//Imgui stuff is heel vergelijkbaar met de tigl shader, hou rekening hiermee
 //TODO Entity moet een id hebben en kunnen bijhouden wat voor signatuur het heeft qua componenten.
 //De reden daarvoor is voornamelijk dat de systems alleen 1 check hoeven te doen ipv constant/per update.
 //TODO Maak een mesh component, deze houd voor nu alleen een VBO bij.
@@ -151,28 +149,15 @@ double lastTime = 0.0;
 //TODO Belichting uitvogelen!
 //TODO cry.
 //TODO Maak een eerste systeem waarbij het ECS in z'n geheel wordt getest.
+//TODO Maak een eigen Camera systeem :)
 void update() {
-    //IMGUI dingen
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-    //Ui dingetjes hiero
-    ImGui::Begin("Buncha stuff");
-
-    ImGui::Begin("");
-
-    ImGui::End();
-
-
-
-
+    controlPanel->Update();
     //Hier ECS dingen testen
     double currentFrame = glfwGetTime();
     float deltaTime = float(currentFrame - lastTime);
     lastTime = currentFrame;
 
-    fpscam->update_cam(window, deltaTime);
+    fpscam->update_cam(deltaTime);
 
 }
 
@@ -200,4 +185,5 @@ void draw() {
 
     tigl::drawVertices(GL_QUADS, cubeVBO);
     tigl::shader->enableColor(false); 
+    controlPanel->Render();
 }
