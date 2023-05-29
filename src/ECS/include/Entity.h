@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include "../components/Component.h"
 
 struct Component;
 
