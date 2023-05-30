@@ -24,7 +24,7 @@ glm::vec3 rotation(0.f);
 
 int viewport[4];
 
-int windowWidth = 640, windowHeight = 480;
+int windowWidth = 1280, windowHeight = 1080;
 
 void init();
 void update();

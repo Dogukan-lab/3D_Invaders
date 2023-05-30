@@ -1,19 +1,28 @@
 #pragma once
-#include <cstdint>
 #include <memory>
 #include <bitset>
 
-namespace ECS{
-	using EntityID = uint32_t;
-	
-
-
-	using ComponentID = uint32_t;
+//TODO: Check if EntityID is necessary.
+namespace types{
+	using EntityID = std::uint32_t;
+	constexpr EntityID MAX_ENTITIES = 10;
+	using ComponentID = std::uint32_t;
 	constexpr ComponentID MAX_COMPONENTS = 32;
-	static ComponentID getComponentID() {
-
-		return 0;
-	}
 	using ComponentSignature = std::bitset<MAX_COMPONENTS>;
+	//using ComponentArray = std::array<std::shared_ptr<Component>, MAX_COMPONENTS>;
 
+	static EntityID getUniqueEntityID() {
+		static EntityID currentEID = 0u;
+		return currentEID++;
+	}
+
+	static ComponentID getUniqueComponentID() {
+		static ComponentID currentID = 0u;
+		return currentID++;
+	}
+	
+	template <typename T> ComponentID getComponentTypeID() {
+		static_assert(std::is_base_of<Component, T>::value, "Provided Component is not a derivative of Component!");
+		static const ComponentID typeID = getUniqueComponentID
+	}
 }

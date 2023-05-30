@@ -1,0 +1,62 @@
+classDiagram
+
+%%De system manager update alle sytemen binnen de ECS.
+%%Als een entiteit wordt aangemaakt wordt er gekeken naar de bitset,
+%%zodat alleen de benodigde systemen een nieuwe entiteit krijgen.
+class SystemManager {
+    std::vector<std::shared_ptr<System>> systems;
+
+    void updateSystems();
+}
+
+
+class Entity {
+    std::map<ComponentType, int> components;
+    std::bitset<Component> componentBitset; 
+
+    void getComponent(int componentID);
+} 
+
+
+
+class Component {
+    Entity* entity;
+}
+class Transform {
+    glm::vec3 position;
+    glm::vec3 rotation;
+    glm::vec3 scale;
+}
+class Sprite {
+    Texture texture;
+}
+
+
+
+class DrawSystem {
+    void draw()
+}
+class System {
+ 
+}
+
+class MoveSystem {
+    void updateMoveComponent();
+}
+
+
+Component <|-- Transform
+Component <|-- Sprite
+
+MoveSystem --> Transform
+SpriteSystem --> Sprite
+DrawSystem --> Entity
+
+Entity --> Component
+MoveSystem --|> System
+DrawSystem --|> System
+SpriteSystem --|> System
+SystemManager -->System
+
+
+
