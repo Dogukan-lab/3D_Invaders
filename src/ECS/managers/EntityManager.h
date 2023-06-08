@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Entity.h"
+#include "../entities/Entity.h"
 #include <vector>
 #include <memory>
 constexpr int MAX_ENTITIES = 10;
@@ -16,17 +16,23 @@ public:
 		entities.clear();
 	}
 
-	/*template<typename T> 
-	std::shared_ptr<Entity> addEntity() {
-		static_assert(std::is_base_of<Entity, T>, "Entity is NULL!");
+	//Function simply adds an entity to the manager.
+	template <typename T>
+	Entity& addEntity() {
+		static_assert(std::is_base_of<Entity, T>::value, "Type is not base of Entity!");
+		auto ptr = std::make_shared<T>();
 
-		this->entities.push_back(T);
+		this->entities.push_back(ptr);
+		return *ptr;
+	}
 
-		return std::make_shared<T>();
-	}*/
+	Entity& addEntity() {
+		//static_assert(std::is_base_of<Entity, T>::value, "Type is not base of Entity!");
+		auto ptr = std::make_shared<Entity>();
 
-	/*template <typename T, TArgs>
-	void addEntity() {}*/
+		this->entities.push_back(ptr);
+		return *ptr;
+	}
 
 	void destroyEntity(const std::shared_ptr<Entity>& entity) {
 		const auto ref = std::find(this->entities.begin(),

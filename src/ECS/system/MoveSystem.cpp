@@ -3,5 +3,10 @@
 
 void MoveSystem::updateMovement()
 {
-	std::cout << 
+	for (const auto& entity : this->entities) {
+		auto comp = entity->getComponent<Transform>();
+		std::cout << "Transform position: X:" << comp->getPosition().x 
+			<< " Y:" << comp->getPosition().y 
+			<< " Z:" << comp->getPosition().z << "\n";
+	}
 }

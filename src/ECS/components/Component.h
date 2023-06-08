@@ -1,11 +1,9 @@
 #pragma once
 
-class Entity;
+#include "../entities/Entity.h"
 
-struct Component {
+class Component {
+public:
 	std::weak_ptr<Entity> coupledEnt;
-
-	Component() = default;
-
-	virtual ~Component() = default;
+	virtual ~Component() {};
 };

@@ -2,10 +2,12 @@
 #include <memory>
 #include <bitset>
 
+
 //TODO: Check if EntityID is necessary.
 namespace types{
 	using EntityID = std::uint32_t;
 	constexpr EntityID MAX_ENTITIES = 10;
+
 	using ComponentID = std::uint32_t;
 	constexpr ComponentID MAX_COMPONENTS = 32;
 	using ComponentSignature = std::bitset<MAX_COMPONENTS>;
@@ -16,13 +18,14 @@ namespace types{
 		return currentEID++;
 	}
 
-	static ComponentID getUniqueComponentID() {
+	inline ComponentID getUniqueComponentID() {
 		static ComponentID currentID = 0u;
 		return currentID++;
 	}
 	
 	template <typename T> ComponentID getComponentTypeID() {
-		static_assert(std::is_base_of<Component, T>::value, "Provided Component is not a derivative of Component!");
-		static const ComponentID typeID = getUniqueComponentID
+		static_assert(std::is_base_of_v<Component, T>, "Provided Component is not a derivative of Component!");
+		static const ComponentID typeID = getUniqueComponentID();
+		return typeID;
 	}
 }

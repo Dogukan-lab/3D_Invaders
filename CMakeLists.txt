@@ -37,10 +37,14 @@ add_executable (${PROJECT_NAME}
 "src/ECS/entities/Entity.h" 
 "src/ECS/components/Component.h" 
 "src/ECS/components/Transform.h"  
-"src/ECS/EntityManager.h" 
+"src/ECS/managers/EntityManager.h" 
 "src/camera/fpsCam.cpp"
 "src/window/Window.cpp" 
-"src/ECS/system/include/System.h" "src/ECS/system/include/MoveSystem.h" "src/ECS/system/MoveSystem.cpp")
+"src/ECS/system/MoveSystem.cpp" 
+"src/ECS/managers/SystemManager.cpp" 
+"src/ECS/Coordinator.h" 
+"src/ECS/components/Mesh.h" 
+"src/ECS/system/RenderSystem.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET 3D_invaders PROPERTY CXX_STANDARD 17)

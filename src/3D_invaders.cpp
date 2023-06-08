@@ -8,7 +8,7 @@
 #include <iostream>
 #include "tigl.h"
 #include "camera/fpsCam.h"
-#include "ECS/EntityManager.h"
+#include "ECS/managers/EntityManager.h"
 #include "ECS/components/Transform.h"
 #include "window/Window.h"
 
@@ -85,14 +85,16 @@ void init() {
         });
 
     fpscam = new FPSCam(glfwWindow);
-    //manager = new EntityManager();
+    manager = new EntityManager();
 
-    //auto entity = manager->addEntity<Entity>();
+    auto entity = manager->addEntity<Entity>();
+    entity.addComponent<Transform>();
+    std::cout << "Entity: " << entity.entityToString() << std::endl;
 
     //entity->addComponent(Transform());
 
 
-    std::vector<tigl::Vertex> vertices = {
+    std::vector<tigl::Vertex> vertices = {  
         //Face of cube GREEN
         tigl::Vertex::PCTN(glm::vec3(-.5f, .5f, -.5f), glm::vec4(0.f, .5f, .0f, 1.f), glm::vec2(0), glm::vec3(0)),
         tigl::Vertex::PCTN(glm::vec3(-.5f, -.5f, -.5f), glm::vec4(0.f, .5f, .0f, 1.f), glm::vec2(0), glm::vec3(0)),
@@ -139,7 +141,6 @@ void init() {
 
 double lastTime = 0.0;
 
-//TODO Optimaliseer waar nodig is in de cmake :)
 //TODO Entity moet een id hebben en kunnen bijhouden wat voor signatuur het heeft qua componenten.
 //De reden daarvoor is voornamelijk dat de systems alleen 1 check hoeven te doen ipv constant/per update.
 //TODO Maak een mesh component, deze houd voor nu alleen een VBO bij.
@@ -174,10 +175,6 @@ void draw() {
     tigl::shader->setViewMatrix(fpscam->getMatrix());
     tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
-    //glm::mat4 model;
-
-    //model = glm::rotate(model, 10.f, glm::vec3(0, 1, 0));
-    //tigl::shader->setModelMatrix(glm::mat4(1.0f));
     tigl::shader->enableColor(true);
 
     ImGui::Render();

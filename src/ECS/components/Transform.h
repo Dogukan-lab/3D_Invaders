@@ -18,6 +18,8 @@ public:
 		: position(newPos), rotation(newRotation), scale(newScale)
 	{}
 
+	~Transform() override = default;
+
 	inline glm::vec3& getPosition() {
 		return this->position;
 	}

@@ -1,8 +1,11 @@
 #pragma once
+#include "../../Types.h"
+#include <set>
 
-#include "../entities/Entity.h"
-
+class Entity;
 class System {
-	std::vector<std::shared_ptr<Entity>> entities;
+public:
+	//TODO maybe change it into a unordered map for easy lookup with the entityID.
+	std::set<std::shared_ptr<Entity>> entities;
 	types::ComponentSignature systemSignature;
 };
