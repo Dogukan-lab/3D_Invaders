@@ -18,11 +18,13 @@ endif ()
 
 include_directories(lib/glad/include) 
 include_directories(lib/tigl/include)
+include_directories(lib/imgui/include)
 include_directories(lib/glm)
 
 add_subdirectory(lib/glm)
 add_subdirectory(lib/tigl)
 add_subdirectory(lib/glad)
+add_subdirectory(lib/imgui)
 
 link_directories(lib/glm)
 
@@ -30,7 +32,7 @@ add_library(glfw STATIC IMPORTED)
 set_target_properties(glfw PROPERTIES IMPORTED_LOCATION ${GLFW_LIB})
 
 # Add source to this project's executable.
-add_executable (${PROJECT_NAME} "src/3D_invaders.cpp")
+add_executable (${PROJECT_NAME} "src/3D_invaders.cpp" "src/camera/fpsCam.cpp" "src/window/Window.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET 3D_invaders PROPERTY CXX_STANDARD 17)
@@ -41,4 +43,3 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW_INCLUDE_DIR})
 target_link_libraries(${PROJECT_NAME} glfw IMGUI opengl32)
 target_link_libraries(${PROJECT_NAME} glad tigl glm)
 
-# TODO: Add tests and install targets if needed.
