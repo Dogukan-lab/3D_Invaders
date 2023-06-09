@@ -1,17 +1,18 @@
 ﻿#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <../imgui/include/imgui_impl_opengl3.h>
-#include <glm/glm.hpp>
-#include "glm/ext.hpp"
 #include <iostream>
+#include "glm/gtx/string_cast.hpp"
 #include "tigl.h"
 #include "camera/fpsCam.h"
 #include "window/Window.h"
+#include "ECS/core/Transform.h"
+#include "ECS/core/EntityManager.h"
 
 GLFWwindow* glfwWindow;
 std::unique_ptr<Window> controlPanel = std::make_unique<Window>();
 FPSCam* fpscam;
-
+EntityManager* manager;
 
 tigl::VBO* cubeVBO;
 
@@ -68,6 +69,42 @@ int main(void)
     return 0;
 }
 
+void printEntity(std::shared_ptr<Entity> entity) {
+    if (!entity)
+        return;
+    std::cout << "Entity ID: " << entity->entityID << std::endl;
+
+    auto transform = entity->getComponent<Transform>();
+    if (!transform)
+        return;
+
+    std::cout << "Entity Signature: " << entity->getSig().to_string() << std::endl;
+    std::cout << "Transform Position: " << glm::to_string(transform->position) << std::endl;
+    std::cout << "Transform Rotation: " << glm::to_string(transform->rotation) << std::endl;
+    std::cout << "Transform Scale: " << glm::to_string(transform->scale) << std::endl;
+    std::cout << "Component entity ref ID: " << transform->entityRef->entityID << std::endl;
+    std::cout << "\n";
+}
+
+void stressTest() {
+    for (int i = 0; i < types::MAX_ENTITIES; i++) {
+        auto entity = manager->addEntity();
+        entity->addComponent<Transform>();
+        printEntity(entity);
+    }
+
+    std::cout << "\n";
+    auto ptr = manager->getEntity(0);
+    ptr->deleteComponent<Transform>();
+    printEntity(ptr);
+
+    auto ptr2 = manager->getEntity(2);
+    ptr2->deleteComponent<Transform>();
+    printEntity(ptr2);
+    manager->destroyEntity(2);
+
+}
+
 void init() {
     controlPanel->Init(glfwWindow);
     glfwSetKeyCallback(glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -80,9 +117,10 @@ void init() {
         });
 
     fpscam = new FPSCam(glfwWindow);
-    //entity->addComponent(Transform());
+    manager = new EntityManager();
 
-
+    stressTest();
+    
     std::vector<tigl::Vertex> vertices = {  
         //Face of cube GREEN
         tigl::Vertex::PCTN(glm::vec3(-.5f, .5f, -.5f), glm::vec4(0.f, .5f, .0f, 1.f), glm::vec2(0), glm::vec3(0)),

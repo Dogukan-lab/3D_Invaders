@@ -4,6 +4,9 @@
 #include "imgui_impl_opengl3.h"
 #include <io.h>
 
+//TODO make the coordinator useful in the imgui UI!
+//extern Coordinator gcoordinator; Use this to get access to entitymanager and do fun stuff with it :)
+
 //TODO Make it so that the entity Manager can pass list to the window
 void Window::Init(GLFWwindow* window)
 {
