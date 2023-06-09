@@ -1,7 +1,0 @@
-# ninja log v5
-10	344	7065568008457907	lib/glad/CMakeFiles/glad.dir/gl.c.obj	8957b291cd04362d
-345	462	7065568009157892	lib/glad/glad.lib	666dcc67318383dc
-2	615	7065568011167913	CMakeFiles/3D_invaders.dir/3D_invaders.cpp.obj	7c3a567b9e4f386d
-6	871	7065568013727890	lib/tigl/CMakeFiles/tigl.dir/tigl.cpp.obj	1a49cfcab57d5b12
-873	931	7065568014087937	lib/tigl/tigl.lib	d2b8cad0ef53228a
-931	1348	7065568018037543	3D_invaders.exe	eb5b695a9f0cfca8
