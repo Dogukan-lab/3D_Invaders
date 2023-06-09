@@ -9,11 +9,11 @@ if (POLICY CMP0141)
 endif()
 
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(GLFW_LIB ${PROJECT_SOURCE_DIR}/lib/glfw/x64/lib-vc2022/glfw3.lib)
-    set(GLFW_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/lib/glfw/x64/include)
+    set(GLFW_LIB ${PROJECT_SOURCE_DIR}/lib/glfw/64-bit/lib-vc2022/glfw3.lib)
+    set(GLFW_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/lib/glfw/64-bit/include)
 else()
-    set(GLFW_LIB ${PROJECT_SOURCE_DIR}/lib/glfw/x86_64/lib-vc2022/glfw3.lib)
-    set(GLFW_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/lib/glfw/x86_64/include)
+    set(GLFW_LIB ${PROJECT_SOURCE_DIR}/lib/glfw/32-bit/lib-vc2022/glfw3.lib)
+    set(GLFW_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/lib/glfw/32-bit/include)
 endif ()
 
 include_directories(lib/glad/include) 
@@ -30,7 +30,7 @@ add_library(glfw STATIC IMPORTED)
 set_target_properties(glfw PROPERTIES IMPORTED_LOCATION ${GLFW_LIB})
 
 # Add source to this project's executable.
-add_executable (${PROJECT_NAME} "src/3D_invaders.cpp" "src/3D_invaders.h" "src/ECS/include/Entity.h" "src/ECS/components/Component.h" "src/ECS/components/Transform.h"  "src/ECS/EntityManager.h")
+add_executable (${PROJECT_NAME} "src/3D_invaders.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET 3D_invaders PROPERTY CXX_STANDARD 17)
@@ -38,7 +38,7 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW_INCLUDE_DIR})
 
-target_link_libraries(${PROJECT_NAME} glfw opengl32)
+target_link_libraries(${PROJECT_NAME} glfw IMGUI opengl32)
 target_link_libraries(${PROJECT_NAME} glad tigl glm)
 
 # TODO: Add tests and install targets if needed.
