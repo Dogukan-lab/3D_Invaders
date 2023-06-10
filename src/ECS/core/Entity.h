@@ -1,23 +1,17 @@
 #pragma once
 #include "Types.h"
-#include <iostream>
+
 /*
 * Main class for creating entities (Might become base class  for other entities).
 * Able to dynamically add components to the @compList through templates.
 */
-
 class Entity {
 public:
 	types::EntityID entityID;
 
-	Entity() {
-		this->entityID = types::getUniqueEntityID();
-		std::fill(this->compList.begin(), this->compList.end(), nullptr);
-	}
+	Entity();
 
-	~Entity() {
-		std::cout << "Entity destroyed! ID: " << this->entityID << std::endl;
-	}
+	~Entity();
 
 	/*
 	* Adds component to array and sets bitflag for signature.

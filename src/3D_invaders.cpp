@@ -1,4 +1,4 @@
-﻿#include <glad/gl.h>
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <../imgui/include/imgui_impl_opengl3.h>
 #include <iostream>
@@ -6,14 +6,17 @@
 #include "tigl.h"
 #include "camera/fpsCam.h"
 #include "window/Window.h"
-#include "ECS/core/Transform.h"
 #include "ECS/core/Mesh.h"
+#include "ECS/core/Transform.h"
 #include "ECS/core/EntityManager.h"
+#include "ECS/core/SystemManager.h"
+#include "ECS/systems/RenderSystem.h"
 
 GLFWwindow* glfwWindow;
 std::unique_ptr<Window> controlPanel = std::make_unique<Window>();
 FPSCam* fpscam;
-EntityManager* manager;
+EntityManager* entManager;
+SystemManager* sysManager;
 
 tigl::VBO* cubeVBO;
 
@@ -113,7 +116,8 @@ void init() {
         });
 
     fpscam = new FPSCam(glfwWindow);
-    manager = new EntityManager();
+    entManager = new EntityManager();
+    sysManager = new SystemManager();
 
     
     std::vector<tigl::Vertex> vertices = {  
@@ -158,7 +162,12 @@ void init() {
 
     cubeVBO = tigl::createVbo(vertices);
 
-    stressTest(cubeVBO);
+    //stressTest(cubeVBO);
+    auto entity = entManager->addEntity();
+    entity->addComponent<Transform>();
+    entity->addComponent<Mesh>()->drawable = cubeVBO;
+    sysManager->registerSystem<RenderSystem>();
+    sysManager->entitySignatureChanged(entity);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -168,7 +177,6 @@ double lastTime = 0.0;
 
 //TODO Entity moet een id hebben en kunnen bijhouden wat voor signatuur het heeft qua componenten.
 //De reden daarvoor is voornamelijk dat de systems alleen 1 check hoeven te doen ipv constant/per update.
-//TODO Maak een mesh component, deze houd voor nu alleen een VBO bij.
 //TODO maak een object loader.
 //TODO maak de object loader zodanig dat het een vbo altijd terug geeft voor de mesh.
 //TODO Textures!
@@ -183,6 +191,7 @@ void update() {
     float deltaTime = float(currentFrame - lastTime);
     lastTime = currentFrame;
 
+    entManager->getEntity(0)->getComponent<Transform>()->position.x += (1 * deltaTime);
     fpscam->update_cam(deltaTime);
 
 }
@@ -200,12 +209,10 @@ void draw() {
     tigl::shader->setViewMatrix(fpscam->getMatrix());
     tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
-    tigl::shader->enableColor(true);
+    //tigl::shader->enableColor(true);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    tigl::drawVertices(GL_QUADS, manager->getEntity(2)->getComponent<Mesh>()->drawable);
-    tigl::shader->enableColor(false); 
+    sysManager->getSystem<RenderSystem>()->draw();
     controlPanel->Render();
 }

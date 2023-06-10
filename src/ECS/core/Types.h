@@ -13,16 +13,16 @@ namespace types {
 	constexpr int MAX_COMPONENTS = 32;
 
 	using EntityID = std::size_t;
-	using ComponentID = std::size_t;
+	using ComponentID = std::uint8_t;
 	using ComponentSignature = std::bitset<MAX_COMPONENTS>; //Signature is the combination of components an entity will represent.
 	using ComponentArray = std::array<std::shared_ptr<Component>, MAX_COMPONENTS>;
 
-	EntityID getUniqueEntityID() {
+	inline EntityID getUniqueEntityID() {
 		static EntityID currentEntID = 0u;
 		return currentEntID++;
 	}
 
-	ComponentID getUniqueComponentID() {
+	inline ComponentID getUniqueComponentID() {
 		static ComponentID currentCompID = 0u;
 		return currentCompID++;
 	}
