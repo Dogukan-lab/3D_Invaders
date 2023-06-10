@@ -1,17 +1,19 @@
 ﻿#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <../imgui/include/imgui_impl_opengl3.h>
-#include <glm/glm.hpp>
-#include "glm/ext.hpp"
 #include <iostream>
+#include "glm/gtx/string_cast.hpp"
 #include "tigl.h"
 #include "camera/fpsCam.h"
 #include "window/Window.h"
+#include "ECS/core/Transform.h"
+#include "ECS/core/Mesh.h"
+#include "ECS/core/EntityManager.h"
 
 GLFWwindow* glfwWindow;
 std::unique_ptr<Window> controlPanel = std::make_unique<Window>();
 FPSCam* fpscam;
-
+EntityManager* manager;
 
 tigl::VBO* cubeVBO;
 
@@ -68,6 +70,37 @@ int main(void)
     return 0;
 }
 
+void printEntity(std::shared_ptr<Entity> entity) {
+    if (!entity)
+        return;
+    std::cout << "Entity ID: " << entity->entityID << std::endl;
+
+   /* auto transform = entity->getComponent<Transform>();
+    if (!transform)
+        return;*/
+
+    std::cout << "Entity Signature: " << entity->getSig().to_string() << std::endl;
+    
+    //Transform debug code
+    /*std::cout << "Transform Position: " << glm::to_string(transform->position) << std::endl;
+    std::cout << "Transform Rotation: " << glm::to_string(transform->rotation) << std::endl;
+    std::cout << "Transform Scale: " << glm::to_string(transform->scale) << std::endl;
+    std::cout << "Component entity ref ID: " << transform->entityRef->entityID << std::endl;*/
+    std::cout << "Entity ID from Mesh: " << entity->getComponent<Mesh>()->entityRef->entityID << std::endl;
+
+
+    std::cout << "\n";
+}
+
+void stressTest(tigl::VBO* vbo) {
+    for (int i = 0; i < types::MAX_ENTITIES; i++) {
+        auto entity = manager->addEntity();
+    }
+
+    manager->getEntity(2)->addComponent<Mesh>()->setMesh(vbo);
+    printEntity(manager->getEntity(2));
+}
+
 void init() {
     controlPanel->Init(glfwWindow);
     glfwSetKeyCallback(glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -80,9 +113,9 @@ void init() {
         });
 
     fpscam = new FPSCam(glfwWindow);
-    //entity->addComponent(Transform());
+    manager = new EntityManager();
 
-
+    
     std::vector<tigl::Vertex> vertices = {  
         //Face of cube GREEN
         tigl::Vertex::PCTN(glm::vec3(-.5f, .5f, -.5f), glm::vec4(0.f, .5f, .0f, 1.f), glm::vec2(0), glm::vec3(0)),
@@ -124,6 +157,9 @@ void init() {
     };
 
     cubeVBO = tigl::createVbo(vertices);
+
+    stressTest(cubeVBO);
+
     glEnable(GL_DEPTH_TEST);
 
 }
@@ -169,7 +205,7 @@ void draw() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    tigl::drawVertices(GL_QUADS, cubeVBO);
+    tigl::drawVertices(GL_QUADS, manager->getEntity(2)->getComponent<Mesh>()->drawable);
     tigl::shader->enableColor(false); 
     controlPanel->Render();
 }
