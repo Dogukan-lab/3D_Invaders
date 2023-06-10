@@ -168,8 +168,8 @@ void init() {
     entity->addComponent<Mesh>()->drawable = cubeVBO;
     sysManager->registerSystem<RenderSystem>();
     sysManager->entitySignatureChanged(entity);
-    entity->deleteComponent<Mesh>();
-    sysManager->entitySignatureChanged(entity);
+    //entity->deleteComponent<Mesh>();
+    //sysManager->entitySignatureChanged(entity);
 
     glEnable(GL_DEPTH_TEST);
 
