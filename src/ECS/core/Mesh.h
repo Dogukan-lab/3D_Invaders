@@ -13,5 +13,4 @@ struct Mesh : public Component {
 	void setMesh(tigl::VBO* vbo) {
 		this->drawable = vbo;
 	}
-
 };
