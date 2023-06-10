@@ -7,6 +7,7 @@
 #include "camera/fpsCam.h"
 #include "window/Window.h"
 #include "ECS/core/Transform.h"
+#include "ECS/core/Mesh.h"
 #include "ECS/core/EntityManager.h"
 
 GLFWwindow* glfwWindow;
@@ -74,35 +75,30 @@ void printEntity(std::shared_ptr<Entity> entity) {
         return;
     std::cout << "Entity ID: " << entity->entityID << std::endl;
 
-    auto transform = entity->getComponent<Transform>();
+   /* auto transform = entity->getComponent<Transform>();
     if (!transform)
-        return;
+        return;*/
 
     std::cout << "Entity Signature: " << entity->getSig().to_string() << std::endl;
-    std::cout << "Transform Position: " << glm::to_string(transform->position) << std::endl;
+    
+    //Transform debug code
+    /*std::cout << "Transform Position: " << glm::to_string(transform->position) << std::endl;
     std::cout << "Transform Rotation: " << glm::to_string(transform->rotation) << std::endl;
     std::cout << "Transform Scale: " << glm::to_string(transform->scale) << std::endl;
-    std::cout << "Component entity ref ID: " << transform->entityRef->entityID << std::endl;
+    std::cout << "Component entity ref ID: " << transform->entityRef->entityID << std::endl;*/
+    std::cout << "Entity ID from Mesh: " << entity->getComponent<Mesh>()->entityRef->entityID << std::endl;
+
+
     std::cout << "\n";
 }
 
-void stressTest() {
+void stressTest(tigl::VBO* vbo) {
     for (int i = 0; i < types::MAX_ENTITIES; i++) {
         auto entity = manager->addEntity();
-        entity->addComponent<Transform>();
-        printEntity(entity);
     }
 
-    std::cout << "\n";
-    auto ptr = manager->getEntity(0);
-    ptr->deleteComponent<Transform>();
-    printEntity(ptr);
-
-    auto ptr2 = manager->getEntity(2);
-    ptr2->deleteComponent<Transform>();
-    printEntity(ptr2);
-    manager->destroyEntity(2);
-
+    manager->getEntity(2)->addComponent<Mesh>()->setMesh(vbo);
+    printEntity(manager->getEntity(2));
 }
 
 void init() {
@@ -119,7 +115,6 @@ void init() {
     fpscam = new FPSCam(glfwWindow);
     manager = new EntityManager();
 
-    stressTest();
     
     std::vector<tigl::Vertex> vertices = {  
         //Face of cube GREEN
@@ -162,6 +157,9 @@ void init() {
     };
 
     cubeVBO = tigl::createVbo(vertices);
+
+    stressTest(cubeVBO);
+
     glEnable(GL_DEPTH_TEST);
 
 }
@@ -207,7 +205,7 @@ void draw() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    tigl::drawVertices(GL_QUADS, cubeVBO);
+    tigl::drawVertices(GL_QUADS, manager->getEntity(2)->getComponent<Mesh>()->drawable);
     tigl::shader->enableColor(false); 
     controlPanel->Render();
 }

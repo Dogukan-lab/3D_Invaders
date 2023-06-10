@@ -1,3 +1,4 @@
+#pragma once
 #include <memory>
 #include <iostream>
 class Entity;
@@ -8,7 +9,6 @@ class Entity;
 * (Might remove the virtual deconstructor).
 */
 struct Component {
-public:
 	Entity* entityRef;
 	~Component() = default;
 

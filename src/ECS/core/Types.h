@@ -1,3 +1,4 @@
+#pragma once
 #include <array>
 #include <bitset>
 #include <memory>
@@ -8,7 +9,7 @@ struct Component;
 * Used for types in the ECS.
 */
 namespace types {
-	constexpr int MAX_ENTITIES = 5;
+	constexpr int MAX_ENTITIES = 500;
 	constexpr int MAX_COMPONENTS = 32;
 
 	using EntityID = std::size_t;
