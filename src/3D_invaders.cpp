@@ -97,11 +97,11 @@ void printEntity(std::shared_ptr<Entity> entity) {
 
 void stressTest(tigl::VBO* vbo) {
     for (int i = 0; i < types::MAX_ENTITIES; i++) {
-        auto entity = manager->addEntity();
+        auto entity = entManager->addEntity();
     }
 
-    manager->getEntity(2)->addComponent<Mesh>()->setMesh(vbo);
-    printEntity(manager->getEntity(2));
+    entManager->getEntity(2)->addComponent<Mesh>()->setMesh(vbo);
+    printEntity(entManager->getEntity(2));
 }
 
 void init() {
@@ -167,6 +167,8 @@ void init() {
     entity->addComponent<Transform>();
     entity->addComponent<Mesh>()->drawable = cubeVBO;
     sysManager->registerSystem<RenderSystem>();
+    sysManager->entitySignatureChanged(entity);
+    entity->deleteComponent<Mesh>();
     sysManager->entitySignatureChanged(entity);
 
     glEnable(GL_DEPTH_TEST);
