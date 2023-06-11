@@ -6,15 +6,17 @@
 * Adds sytems by registering them.
 * Adds entities to systems when bitsets "overlap".
 * Also needs to be able to update the list of entities when an entity is destroyed.
+* TODO Set system signature through coordinator perhaps?
 */
 class SystemManager {
 public:
 	SystemManager() = default;
 
-	/*
-	* Registers a system to the manager.
+	/**
+	* @brief Registers a system to the manager.
 	* Able to add enties to system through the manager now.
-	* When creating the system
+	* When creating the system its name gets passed as the key and the system is the value.
+	* TODO Consider making this a void function for you don't use it at all for the return value.
 	*/
 	template<typename T>
 	std::shared_ptr<T> registerSystem() {
@@ -34,6 +36,8 @@ public:
 	* TODO when you have time improve this lookup ples.
 	*/
 	void entitySignatureChanged(std::shared_ptr<Entity> entity);
+
+	void destroyEntity(std::shared_ptr<Entity> entity);
 
 	template<typename T>
 	std::shared_ptr<T> getSystem() {

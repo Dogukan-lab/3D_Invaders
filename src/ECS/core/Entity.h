@@ -4,6 +4,8 @@
 /*
 * Main class for creating entities (Might become base class  for other entities).
 * Able to dynamically add components to the @compList through templates.
+* TODO add a addNComponents template function to add multiple components at once.
+* TODO add a 
 */
 class Entity {
 public:
@@ -41,9 +43,9 @@ public:
 		this->signature[types::getComponentTypeID<T>()] = false;
 	}
 
-	//TODO create entity toString method!
+	//TODO create entity toString method! If base class then make it overridable.
 
-	types::ComponentSignature& getSig() {
+	inline types::ComponentSignature& getSig() {
 		return this->signature;
 	}
 

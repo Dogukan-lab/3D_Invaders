@@ -18,3 +18,18 @@ void SystemManager::entitySignatureChanged(std::shared_ptr<Entity> entity)
 		}
 	}
 }
+
+void SystemManager::destroyEntity(std::shared_ptr<Entity> entity)
+{
+	for (const auto& systemPair : this->systems) {
+		const auto& system = systemPair.second;
+
+		system->entities.erase(
+			std::find(
+				system->entities.begin(),
+				system->entities.end(),
+				entity
+			)
+		);
+	}
+}

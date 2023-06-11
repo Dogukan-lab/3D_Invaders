@@ -45,7 +45,8 @@ add_executable (${PROJECT_NAME} "src/3D_invaders.cpp"
 "src/ECS/core/SystemManager.cpp" 
 "src/ECS/systems/RenderSystem.h"
 "src/ECS/systems/RenderSystem.cpp"
-"src/ECS/core/Entity.cpp")
+"src/ECS/core/Entity.cpp" 
+"src/ECS/core/Coordinator.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET 3D_invaders PROPERTY CXX_STANDARD 17)
