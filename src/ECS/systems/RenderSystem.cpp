@@ -6,7 +6,7 @@
 
 RenderSystem::RenderSystem()
 {
-	this->entities.reserve(10);
+	this->entities = {};
 	this->systemSignature.set(types::getComponentTypeID<Mesh>());
 	this->systemSignature.set(types::getComponentTypeID<Transform>());
 }

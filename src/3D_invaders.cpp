@@ -8,15 +8,15 @@
 #include "window/Window.h"
 #include "ECS/core/Mesh.h"
 #include "ECS/core/Transform.h"
-#include "ECS/core/EntityManager.h"
-#include "ECS/core/SystemManager.h"
+#include "ECS/core/Coordinator.h"
 #include "ECS/systems/RenderSystem.h"
 
 GLFWwindow* glfwWindow;
 std::unique_ptr<Window> controlPanel = std::make_unique<Window>();
 FPSCam* fpscam;
-EntityManager* entManager;
-SystemManager* sysManager;
+Coordinator* ecsCoordinator;
+
+//struct RenderSystem;
 
 tigl::VBO* cubeVBO;
 
@@ -40,6 +40,7 @@ int main(void)
     /* Create a windowed mode window and its OpenGL context */
     glfwWindow = glfwCreateWindow(windowWidth, windowHeight, "Why are you reading this?!??!", NULL, NULL);
     if (!glfwWindow)
+
     {
         glfwTerminate();
         return -1;
@@ -91,17 +92,16 @@ void printEntity(std::shared_ptr<Entity> entity) {
     std::cout << "Component entity ref ID: " << transform->entityRef->entityID << std::endl;*/
     std::cout << "Entity ID from Mesh: " << entity->getComponent<Mesh>()->entityRef->entityID << std::endl;
 
-
     std::cout << "\n";
 }
 
 void stressTest(tigl::VBO* vbo) {
     for (int i = 0; i < types::MAX_ENTITIES; i++) {
-        auto entity = entManager->addEntity();
+        auto entity = ecsCoordinator->createEntity();
     }
 
-    entManager->getEntity(2)->addComponent<Mesh>()->setMesh(vbo);
-    printEntity(entManager->getEntity(2));
+    ecsCoordinator->getEntity(2)->addComponent<Mesh>()->setMesh(vbo);
+    printEntity(ecsCoordinator->getEntity(2));
 }
 
 void init() {
@@ -116,8 +116,7 @@ void init() {
         });
 
     fpscam = new FPSCam(glfwWindow);
-    entManager = new EntityManager();
-    sysManager = new SystemManager();
+    ecsCoordinator = new Coordinator();
 
     
     std::vector<tigl::Vertex> vertices = {  
@@ -163,11 +162,12 @@ void init() {
     cubeVBO = tigl::createVbo(vertices);
 
     //stressTest(cubeVBO);
-    auto entity = entManager->addEntity();
-    entity->addComponent<Transform>();
-    entity->addComponent<Mesh>()->drawable = cubeVBO;
-    sysManager->registerSystem<RenderSystem>();
-    sysManager->entitySignatureChanged(entity);
+    ecsCoordinator->registerSystem<RenderSystem>();
+    auto entity = ecsCoordinator->createEntity();
+    ecsCoordinator->addComponent<Mesh>(entity->entityID)->drawable = cubeVBO; //Deze lijkt redundant als ik toch al entity backref xD
+    ecsCoordinator->addComponent<Transform>(entity->entityID); //Deze lijkt redundant als ik toch al entity backref xD
+    //entity->addComponent<Mesh>()->drawable = cubeVBO;
+    //entity->addComponent<Transform>();
     //entity->deleteComponent<Mesh>();
     //sysManager->entitySignatureChanged(entity);
 
@@ -177,8 +177,6 @@ void init() {
 
 double lastTime = 0.0;
 
-//TODO Entity moet een id hebben en kunnen bijhouden wat voor signatuur het heeft qua componenten.
-//De reden daarvoor is voornamelijk dat de systems alleen 1 check hoeven te doen ipv constant/per update.
 //TODO maak een object loader.
 //TODO maak de object loader zodanig dat het een vbo altijd terug geeft voor de mesh.
 //TODO Textures!
@@ -193,13 +191,12 @@ void update() {
     float deltaTime = float(currentFrame - lastTime);
     lastTime = currentFrame;
 
-    entManager->getEntity(0)->getComponent<Transform>()->position.x += (1 * deltaTime);
+    ecsCoordinator->getEntity(0)->getComponent<Transform>()->position.x += (1 * deltaTime);
     fpscam->update_cam(deltaTime);
 
 }
 
 void draw() {
-
     glViewport(0, 0, windowWidth, windowHeight); 
     glGetIntegerv(GL_VIEWPORT, viewport);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -215,6 +212,6 @@ void draw() {
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    sysManager->getSystem<RenderSystem>()->draw();
+    ecsCoordinator->getSystem<RenderSystem>()->draw();
     controlPanel->Render();
 }

@@ -17,7 +17,7 @@ public:
 	* TODO make overloaded function that functions with a template instead, 
 	* only needed when entities become dynamic for e.g. player, worldObject and so on.
 	*/
-	std::shared_ptr<Entity> addEntity() {
+	std::shared_ptr<Entity> createEntity() {
 		auto ptr = std::make_shared<Entity>();
 		this->entities[ptr->entityID] = ptr;
 
@@ -27,12 +27,12 @@ public:
 	/*
 	* Destroys entity based on the id.
 	*/
-	void destroyEntity(const int& entityID) {
+	void destroyEntity(const types::EntityID& entityID) {
 		this->entities.erase(entityID);
 	}
 
-	std::shared_ptr<Entity> getEntity(const int& id) {
-		return this->entities[id];
+	std::shared_ptr<Entity> getEntity(const types::EntityID& entityID) {
+		return this->entities[entityID];
 	}
 
 private:
