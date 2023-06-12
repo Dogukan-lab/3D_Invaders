@@ -32,6 +32,10 @@ public:
 		return this->entityManager->getEntity(entityID);
 	}
 
+	std::map<types::EntityID, std::shared_ptr<Entity>> getEntities() {
+		return this->entityManager->getEntities();
+	}
+
 	void destroyEntity(std::shared_ptr<Entity> entity) {
 		this->entityManager->destroyEntity(entity->entityID);
 		this->systemManager->destroyEntity(entity);

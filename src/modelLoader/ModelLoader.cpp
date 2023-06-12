@@ -9,6 +9,7 @@
 //TODO ModelManager needs unordered map of models <objname, tigl::VBO>
 
 void ModelLoader::loadModel(const std::string& fileName) {
+	clearCache();
 	std::ifstream fileStream(fileName);
 	if (!fileStream.is_open()) {
 		throw std::invalid_argument("File either not found, or invalid path!");
@@ -82,4 +83,12 @@ tigl::VBO* ModelLoader::createVBO() {
 	tigl::VBO* modelVBO = tigl::createVbo(vertices);
 	vertices.clear();
 	return modelVBO;
+}
+
+void ModelLoader::clearCache()
+{
+	this->positions.clear();
+	this->normals.clear();
+	this->textureCoords.clear();
+	this->faces.clear();
 }

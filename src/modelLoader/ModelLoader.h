@@ -18,6 +18,8 @@ public:
 
 private:
 	//void addPosition();
+	//Clears all data of model if already loaded in.
+	void clearCache();
 
 	//Stores all the ids that need to be loaded in
 	struct Face {

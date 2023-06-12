@@ -8,7 +8,6 @@
 #include "window/Window.h"
 #include "ECS/core/Mesh.h"
 #include "ECS/core/Transform.h"
-#include "ECS/core/LightComponent.h"
 #include "ECS/core/Coordinator.h"
 #include "ECS/systems/RenderSystem.h"
 #include "modelLoader/ModelLoader.h"
@@ -125,7 +124,7 @@ void init() {
     ecsCoordinator = new Coordinator();
 
     
-    std::vector<tigl::Vertex> vertices = {  
+    std::vector<tigl::Vertex> quadVertices = {  
         //Face of cube GREEN
         tigl::Vertex::PCTN(glm::vec3(-.5f, .5f, -.5f), glm::vec4(0.f, .5f, .0f, 1.f), glm::vec2(0), glm::vec3(0, 0, 1)),
         tigl::Vertex::PCTN(glm::vec3(-.5f, -.5f, -.5f), glm::vec4(0.f, .5f, .0f, 1.f), glm::vec2(0), glm::vec3(0, 0, 1)),
@@ -165,7 +164,11 @@ void init() {
 
     };
 
-    cubeVBO = tigl::createVbo(vertices);
+    std::vector<tigl::Vertex> triangleVertices {
+
+    };
+
+    cubeVBO = tigl::createVbo(quadVertices);
 
     //stressTest(cubeVBO);
     modelLoader->loadModel("D:\\githubrepos\\3D_Invaders\\resources\\models\\suzanne.obj");
@@ -182,6 +185,10 @@ void init() {
     auto& entity3 = ecsCoordinator->createEntity();
     ecsCoordinator->addComponent<Mesh>(entity3->entityID)->drawable = modelLoader->createVBO();
     ecsCoordinator->addComponent<Transform>(entity3->entityID)->position = { 5, -1, 4 };
+
+    auto& entity4 = ecsCoordinator->createEntity();
+    //ecsCoordinator->addComponent<Mesh>(entity4->entityID)->drawable = worldPlane;
+    ecsCoordinator->addComponent<Transform>(entity4->entityID);
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -195,7 +202,7 @@ double lastTime = 0.0;
 //TODO Maak een eerste systeem waarbij het ECS in z'n geheel wordt getest.
 //TODO Maak een eigen Camera systeem :)
 void update() {   
-    controlPanel->Update();
+    controlPanel->Update(ecsCoordinator);
     //Hier ECS dingen testen
 
     double currentFrame = glfwGetTime();

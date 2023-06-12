@@ -1,4 +1,5 @@
 #pragma once
+#include "../ECS/core/Coordinator.h"
 struct GLFWwindow;
 /**
 * Generic Window setup for Imgui intandem with GLFW.
@@ -7,7 +8,7 @@ struct GLFWwindow;
 class Window {
 public:
 	void Init(GLFWwindow* window);
-	virtual void Update();
+	virtual void Update(Coordinator* coordinator);
 	void Render();
 	void ShutDown();
 private:

@@ -2,7 +2,6 @@
 #include "../core/Entity.h"
 #include "../core/Mesh.h"
 #include "../core/Transform.h"
-#include "../core/LightComponent.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 RenderSystem::RenderSystem()
@@ -36,7 +35,6 @@ void RenderSystem::draw()
 	//TODO Lighcomponent so you can move it around n shiet.
 	for (const auto& entity : this->entities) {
 		auto transform = entity->getComponent<Transform>();
-		//auto lightComp = entity->getComponent<LightComponent>();
 		glm::mat4 modelM = glm::mat4(1.f);
 				
 		modelM = glm::scale(modelM, transform->scale * 0.5f);

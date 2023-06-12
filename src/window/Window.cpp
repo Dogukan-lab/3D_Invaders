@@ -2,8 +2,11 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "../ECS/core/Coordinator.h"
+#include "../ECS/core/Transform.h"
 #include <io.h>
-
+#include <optional>
+#include <iostream>
 //TODO make the coordinator useful in the imgui UI!
 //extern Coordinator gcoordinator; Use this to get access to entitymanager and do fun stuff with it :)
 
@@ -14,7 +17,6 @@ void Window::Init(GLFWwindow* window)
     ImGui::CreateContext();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init();
-
 }
 
 void Window::NewFrame() {
@@ -23,15 +25,34 @@ void Window::NewFrame() {
     ImGui::NewFrame();
 }
 
-void Window::Update()
+void EditEntity(std::shared_ptr<Entity> entity) {
+    ImGui::Text("Entity ID: %d", entity->entityID);
+    auto& transform = entity->getComponent<Transform>();  
+
+    ImGui::Text("Entity: %d, Position", entity->entityID);
+    ImGui::SliderFloat(entity->entityID + "  Position X", &transform->position.x, -10, 10);
+    ImGui::SliderFloat(entity->entityID + "  Position Y", &transform->position.y, -10, 10);
+    ImGui::SliderFloat(entity->entityID + "  Position Z", &transform->position.z, -10, 10);
+
+    ImGui::Text("Entity: %d, Rotation", entity->entityID);
+    ImGui::SliderFloat(entity->entityID + "  Rotation X", &transform->rotation.x, -100, 100);
+    ImGui::SliderFloat(entity->entityID + "  Rotation Y", &transform->rotation.y, -100, 100);
+    ImGui::SliderFloat(entity->entityID + "  Rotation Z", &transform->rotation.z, -100, 100);
+}
+
+void Window::Update(Coordinator* coordinator)
 {
     Window::NewFrame();
-    static float value = 0.f;
     //ImGui funstuff.
     ImGui::Begin("Main Hub");
     //ImGui components before render.
-    ImGui::Text("This is a test to check if it works!");
-    ImGui::SliderFloat("Float thingy", &value, 0.f, 1.f);
+
+    // ImGui code
+    for (const auto& entityPair : coordinator->getEntities()) {
+        auto& entity = entityPair.second;
+        EditEntity(entity);
+        ImGui::Separator();
+    }
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();
 }

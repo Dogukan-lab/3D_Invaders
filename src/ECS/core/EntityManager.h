@@ -35,6 +35,10 @@ public:
 		return this->entities[entityID];
 	}
 
+	std::map<types::EntityID, std::shared_ptr<Entity>> getEntities() {
+		return this->entities;
+	}
+
 private:
 	//Map for unique entityIDs as well as storing the entities.
 	std::map<types::EntityID, std::shared_ptr<Entity>> entities;
