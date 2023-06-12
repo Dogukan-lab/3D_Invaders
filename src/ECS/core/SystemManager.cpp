@@ -11,7 +11,7 @@ void SystemManager::entitySignatureChanged(std::shared_ptr<Entity> entity)
 			system->entities.push_back(entity);
 		}
 		else {
-			std::cout << "Entity not in system!" << system->systemSignature.to_string() << "\n";
+			std::cout << "Entity not in system!" << entity->entityID << "Sys sig: " << system->systemSignature.to_string() << "\n";
 			system->entities.erase(
 				std::remove(system->entities.begin(), system->entities.end(), entity),
 				system->entities.end());

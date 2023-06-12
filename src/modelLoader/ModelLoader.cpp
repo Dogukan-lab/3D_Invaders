@@ -8,8 +8,7 @@
 //TODO ModelManager so that we can cache the VBO's created.
 //TODO ModelManager needs unordered map of models <objname, tigl::VBO>
 
-ModelLoader::ModelLoader(const std::string& fileName)
-{
+void ModelLoader::loadModel(const std::string& fileName) {
 	std::ifstream fileStream(fileName);
 	if (!fileStream.is_open()) {
 		throw std::invalid_argument("File either not found, or invalid path!");
@@ -19,7 +18,7 @@ ModelLoader::ModelLoader(const std::string& fileName)
 	while (!fileStream.eof()) {
 		std::getline(fileStream, line);
 		std::stringstream strStream(line);
-		
+
 		std::string prefix;
 		strStream >> prefix;
 
@@ -65,8 +64,7 @@ ModelLoader::ModelLoader(const std::string& fileName)
 	fileStream.close();
 }
 
-tigl::VBO* ModelLoader::createVBO()
-{
+tigl::VBO* ModelLoader::createVBO() {
 	std::vector<tigl::Vertex> vertices;
 
 	//Load everything into the vertex;

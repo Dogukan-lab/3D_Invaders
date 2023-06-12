@@ -4,12 +4,16 @@
 
 //TODO Maybe have helper functions so that constructor wont be so full of the implementations?
 /*
-* The ModelLoader loads the specified models in
+* The ModelLoader loads the specified models in through the resources path.
 */
 class ModelLoader {
 public:
-	ModelLoader(const std::string& fileName);
+	ModelLoader() = default;
 
+	//Loads specified model in .obj format
+	void loadModel(const std::string& fileName);
+
+	//After extracting the 3D data, combine it into vertices to render later on.
 	tigl::VBO* createVBO();
 
 private:
@@ -27,5 +31,4 @@ private:
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> textureCoords; //For now dont use this, too complicated no model loading yet.
 	std::vector<Face> faces;
-
 };
