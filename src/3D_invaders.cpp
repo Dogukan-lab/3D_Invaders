@@ -10,11 +10,13 @@
 #include "ECS/core/Transform.h"
 #include "ECS/core/Coordinator.h"
 #include "ECS/systems/RenderSystem.h"
+#include "modelLoader/ModelLoader.h"
 
 GLFWwindow* glfwWindow;
 std::unique_ptr<Window> controlPanel = std::make_unique<Window>();
 FPSCam* fpscam;
 Coordinator* ecsCoordinator;
+ModelLoader* modelLoader;
 
 //struct RenderSystem;
 
@@ -118,6 +120,7 @@ void init() {
         });
 
     fpscam = new FPSCam(glfwWindow);
+    modelLoader = new ModelLoader("D:\\githubrepos\\3D_Invaders\\resources\\models\\suzanne.obj");
     ecsCoordinator = new Coordinator();
 
     
@@ -166,7 +169,7 @@ void init() {
     //stressTest(cubeVBO);
     ecsCoordinator->registerSystem<RenderSystem>();
     auto entity = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity->entityID)->drawable = cubeVBO; //Deze lijkt redundant als ik toch al entity backref xD
+    ecsCoordinator->addComponent<Mesh>(entity->entityID)->drawable = modelLoader->createVBO(); //Deze lijkt redundant als ik toch al entity backref xD
     ecsCoordinator->addComponent<Transform>(entity->entityID); //Deze lijkt redundant als ik toch al entity backref xD
     //entity->addComponent<Mesh>()->drawable = cubeVBO;
     //entity->addComponent<Transform>();
@@ -195,6 +198,7 @@ void update() {
     lastTime = currentFrame;
 
     //ecsCoordinator->getEntity(0)->getComponent<Transform>()->position.x += (1 * deltaTime);
+    ecsCoordinator->getEntity(0)->getComponent<Transform>()->rotation.y += (1 * deltaTime);
     fpscam->update_cam(deltaTime);
 
 }
