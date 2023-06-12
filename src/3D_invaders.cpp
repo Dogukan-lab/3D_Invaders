@@ -184,7 +184,7 @@ void init() {
 
     //stressTest(cubeVBO);
     //TODO When demo happens make sure to change absolute path to relative!
-    modelLoader->loadModel("..\\resources\\models\\suzanne.obj");
+    modelLoader->loadModel("D:\\githubrepos\\3D_Invaders\\resources\\models\\suzanne.obj");
     ecsCoordinator->registerSystem<RenderSystem>();
     auto& entity = ecsCoordinator->createEntity();
     ecsCoordinator->addComponent<Mesh>(entity->entityID)->drawable = modelLoader->createVBO(); //Deze lijkt redundant als ik toch al entity backref xD
@@ -202,7 +202,7 @@ void init() {
     auto& entity4 = ecsCoordinator->createEntity();
     ecsCoordinator->addComponent<Mesh>(entity4->entityID)->drawable = worldPlane;
     auto& transform4 = ecsCoordinator->addComponent<Transform>(entity4->entityID);
-    ecsCoordinator->addComponent<TextureComponent>(entity4->entityID)->loadTexture("..\\3D_Invaders\\resources\\textures\\Green_Wall_Rock.png");
+    ecsCoordinator->addComponent<TextureComponent>(entity4->entityID)->loadTexture("D:\\githubrepos\\3D_Invaders\\resources\\textures\\Green_Wall_Rock.png");
     transform4->position = { 0, 9.6, 0 };
     transform4->scale = { 20, 20, 20 };
     glEnable(GL_DEPTH_TEST);
@@ -211,12 +211,6 @@ void init() {
 
 double lastTime = 0.0;
 
-//TODO maak een object loader.
-//TODO maak de object loader zodanig dat het een vbo altijd terug geeft voor de mesh.
-//TODO Textures!
-//TODO Belichting uitvogelen!
-//TODO cry.
-//TODO Maak een eerste systeem waarbij het ECS in z'n geheel wordt getest.
 //TODO Maak een eigen Camera systeem :)
 void update() {   
     controlPanel->Update(ecsCoordinator);
