@@ -2,6 +2,7 @@
 #include "../core/Entity.h"
 #include "../core/Mesh.h"
 #include "../core/Transform.h"
+#include "../core/TextureComponent.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 RenderSystem::RenderSystem()
@@ -19,7 +20,7 @@ void RenderSystem::draw()
 {
 	tigl::shader->enableLighting(true);
 	tigl::shader->enableColor(true);
-	tigl::shader->setShinyness(32.f);
+	tigl::shader->setShinyness(20.f);
 	tigl::shader->setLightCount(1);
 	tigl::shader->setLightDirectional(0, true);
 	tigl::shader->setLightPosition(0, { 0, 10, 2 });
@@ -29,20 +30,31 @@ void RenderSystem::draw()
 
 	tigl::shader->enableFog(true);
 	tigl::shader->setFogColor({ 0.3f, 0.4f, 0.6f });
-	tigl::shader->setFogLinear(.1f, 10.f);
+	tigl::shader->setFogExp2(.4f);
 	//tigl::shader->enableTexture(true);
 
 	//TODO Lighcomponent so you can move it around n shiet.
 	for (const auto& entity : this->entities) {
 		auto transform = entity->getComponent<Transform>();
 		glm::mat4 modelM = glm::mat4(1.f);
-				
-		modelM = glm::scale(modelM, transform->scale * 0.5f);
+		auto texture = entity->getComponent<TextureComponent>();
+		if (texture) {
+			//std::cout << "Entity ID: " << entity->entityID << "Has TEXTURE!" << std::endl;
+			tigl::shader->enableTexture(true);
+			tigl::shader->enableColor(false);
+			tigl::shader->enableLighting(false);
+			texture->bindTexture();
+		}
+
 		modelM = glm::translate(modelM, transform->position);
 		modelM = glm::rotate(modelM, transform->rotation.x, glm::vec3(1, 0, 0));
 		modelM = glm::rotate(modelM, transform->rotation.y, glm::vec3(0, 1, 0));
 		modelM = glm::rotate(modelM, transform->rotation.z, glm::vec3(0, 0, 1));
+		modelM = glm::scale(modelM, transform->scale);
 		tigl::shader->setModelMatrix(modelM);
 		tigl::drawVertices(GL_TRIANGLES, entity->getComponent<Mesh>()->drawable);
+		tigl::shader->enableTexture(false);
+		tigl::shader->enableLighting(true);
+		tigl::shader->enableColor(true);
 	}
 }

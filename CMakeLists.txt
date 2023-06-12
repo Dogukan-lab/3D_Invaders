@@ -45,6 +45,7 @@ add_executable (${PROJECT_NAME} "src/3D_invaders.cpp"
 "src/ECS/systems/RenderSystem.cpp"
 "src/ECS/core/Entity.cpp" 
 "src/ECS/core/Coordinator.h" 
+"src/ECS/core/TextureComponent.cpp"
 "src/modelLoader/ModelLoader.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)

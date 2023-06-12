@@ -55,7 +55,10 @@ public:
 	template<typename T>
 	std::shared_ptr<T> getComponent() {
 		static_assert(std::is_base_of_v<Component, T>, "Type is not base of component class!");
-		return std::static_pointer_cast<T>(this->compList[types::getComponentTypeID<T>()]);
+		if (this->signature.test(types::getComponentTypeID<T>()))
+			return std::static_pointer_cast<T>(this->compList[types::getComponentTypeID<T>()]);
+		else
+			return nullptr;
 	}
 
 private:
