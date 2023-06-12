@@ -36,6 +36,12 @@ void FPSCam::update_cam(float deltaTime) {
         move(180, deltaTime);
     if (glfwGetKey(this->currentWindow, GLFW_KEY_A))
         move(0, deltaTime);
+    if (glfwGetKey(this->currentWindow, GLFW_KEY_LEFT_SHIFT)) {
+        this->position.y += (1 * deltaTime);
+    }
+    if (glfwGetKey(this->currentWindow, GLFW_KEY_SPACE)) {
+        this->position.y -= (1 * deltaTime);
+    }
     
 }
 

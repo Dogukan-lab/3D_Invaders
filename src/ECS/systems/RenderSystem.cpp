@@ -30,7 +30,7 @@ void RenderSystem::draw()
 
 	tigl::shader->enableFog(true);
 	tigl::shader->setFogColor({ 0.3f, 0.4f, 0.6f });
-	tigl::shader->setFogExp2(.4f);
+	tigl::shader->setFogExp2(.25f);
 	//tigl::shader->enableTexture(true);
 
 	//TODO Lighcomponent so you can move it around n shiet.
@@ -41,8 +41,6 @@ void RenderSystem::draw()
 		if (texture) {
 			//std::cout << "Entity ID: " << entity->entityID << "Has TEXTURE!" << std::endl;
 			tigl::shader->enableTexture(true);
-			tigl::shader->enableColor(false);
-			tigl::shader->enableLighting(false);
 			texture->bindTexture();
 		}
 
@@ -54,7 +52,5 @@ void RenderSystem::draw()
 		tigl::shader->setModelMatrix(modelM);
 		tigl::drawVertices(GL_TRIANGLES, entity->getComponent<Mesh>()->drawable);
 		tigl::shader->enableTexture(false);
-		tigl::shader->enableLighting(true);
-		tigl::shader->enableColor(true);
 	}
 }

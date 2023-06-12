@@ -109,7 +109,7 @@ void stressTest(tigl::VBO* vbo) {
     printEntity(ecsCoordinator->getEntity(2));
 }
 
-const float tileSize = 1 / 32.f;
+const float tileSize = 32.f;
 
 void init() {
     controlPanel->Init(glfwWindow);
@@ -184,7 +184,7 @@ void init() {
 
     //stressTest(cubeVBO);
     //TODO When demo happens make sure to change absolute path to relative!
-    modelLoader->loadModel("D:\\githubrepos\\3D_Invaders\\resources\\models\\suzanne.obj");
+    modelLoader->loadModel("..\\..\\..\\resources\\models\\suzanne.obj");
     ecsCoordinator->registerSystem<RenderSystem>();
     auto& entity = ecsCoordinator->createEntity();
     ecsCoordinator->addComponent<Mesh>(entity->entityID)->drawable = modelLoader->createVBO(); //Deze lijkt redundant als ik toch al entity backref xD
@@ -194,7 +194,7 @@ void init() {
     ecsCoordinator->addComponent<Mesh>(entity2->entityID)->drawable = modelLoader->createVBO();
     ecsCoordinator->addComponent<Transform>(entity2->entityID)->position = {-5, 2, 3};
 
-    modelLoader->loadModel("D:\\githubrepos\\3D_Invaders\\resources\\models\\chr_knight.obj");
+    modelLoader->loadModel("..\\..\\..\\resources\\models\\chr_knight.obj");
     auto& entity3 = ecsCoordinator->createEntity();
     ecsCoordinator->addComponent<Mesh>(entity3->entityID)->drawable = modelLoader->createVBO();
     ecsCoordinator->addComponent<Transform>(entity3->entityID)->position = { 5, -1, 4 };
@@ -202,9 +202,11 @@ void init() {
     auto& entity4 = ecsCoordinator->createEntity();
     ecsCoordinator->addComponent<Mesh>(entity4->entityID)->drawable = worldPlane;
     auto& transform4 = ecsCoordinator->addComponent<Transform>(entity4->entityID);
-    ecsCoordinator->addComponent<TextureComponent>(entity4->entityID)->loadTexture("D:\\githubrepos\\3D_Invaders\\resources\\textures\\Green_Wall_Rock.png");
-    transform4->position = { 0, 9.6, 0 };
-    transform4->scale = { 20, 20, 20 };
+    auto& tex4 = ecsCoordinator->addComponent<TextureComponent>(entity4->entityID);
+    tex4->loadTexture("..\\..\\..\\resources\\textures\\Brick_wall.png");
+
+    transform4->position = { 0, 6, 0 };
+    transform4->scale = { 15, 15, 15 };
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE);
 }
