@@ -35,18 +35,17 @@ set_target_properties(glfw PROPERTIES IMPORTED_LOCATION ${GLFW_LIB})
 add_executable (${PROJECT_NAME} "src/3D_invaders.cpp" 
 "src/camera/fpsCam.cpp" 
 "src/window/Window.cpp" 
-"src/ECS/core/Types.h" 
-"src/ECS/core/Entity.h" 
+"src/ECS/core/Types.h"  
 "src/ECS/core/Component.h" 
 "src/ECS/core/EntityManager.h" 
 "src/ECS/core/Transform.h"
 "src/ECS/core/Mesh.h"
 "src/ECS/core/System.h"
 "src/ECS/core/SystemManager.cpp" 
-"src/ECS/systems/RenderSystem.h"
 "src/ECS/systems/RenderSystem.cpp"
 "src/ECS/core/Entity.cpp" 
-"src/ECS/core/Coordinator.h")
+"src/ECS/core/Coordinator.h" 
+"src/modelLoader/ModelLoader.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET 3D_invaders PROPERTY CXX_STANDARD 17)

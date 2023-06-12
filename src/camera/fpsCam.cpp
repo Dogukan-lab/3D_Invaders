@@ -47,7 +47,8 @@ void FPSCam::move(float angle, float vac) {
 
 FPSCam::FPSCam(GLFWwindow* window) {
     this->currentWindow = window;
-    glfwSetInputMode(window, GLFW_HAND_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CENTER_CURSOR);
     if (glfwRawMouseMotionSupported())
         glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 }
