@@ -8,6 +8,7 @@
 #include "window/Window.h"
 #include "ECS/core/Mesh.h"
 #include "ECS/core/Transform.h"
+#include "ECS/core/LightComponent.h"
 #include "ECS/core/Coordinator.h"
 #include "ECS/systems/RenderSystem.h"
 #include "modelLoader/ModelLoader.h"
@@ -120,7 +121,7 @@ void init() {
         });
 
     fpscam = new FPSCam(glfwWindow);
-    modelLoader = new ModelLoader("D:\\githubrepos\\3D_Invaders\\resources\\models\\suzanne.obj");
+    modelLoader = new ModelLoader();
     ecsCoordinator = new Coordinator();
 
     
@@ -167,17 +168,21 @@ void init() {
     cubeVBO = tigl::createVbo(vertices);
 
     //stressTest(cubeVBO);
+    modelLoader->loadModel("D:\\githubrepos\\3D_Invaders\\resources\\models\\suzanne.obj");
     ecsCoordinator->registerSystem<RenderSystem>();
-    auto entity = ecsCoordinator->createEntity();
+    auto& entity = ecsCoordinator->createEntity();
     ecsCoordinator->addComponent<Mesh>(entity->entityID)->drawable = modelLoader->createVBO(); //Deze lijkt redundant als ik toch al entity backref xD
     ecsCoordinator->addComponent<Transform>(entity->entityID); //Deze lijkt redundant als ik toch al entity backref xD
-    //entity->addComponent<Mesh>()->drawable = cubeVBO;
-    //entity->addComponent<Transform>();
-    //entity->deleteComponent<Mesh>();
-    //sysManager->entitySignatureChanged(entity);
+    
+    auto& entity2 = ecsCoordinator->createEntity();
+    ecsCoordinator->addComponent<Mesh>(entity2->entityID)->drawable = modelLoader->createVBO();
+    ecsCoordinator->addComponent<Transform>(entity2->entityID)->position = {-5, 2, 3};
 
+    modelLoader->loadModel("D:\\githubrepos\\3D_Invaders\\resources\\models\\chr_knight.obj");
+    auto& entity3 = ecsCoordinator->createEntity();
+    ecsCoordinator->addComponent<Mesh>(entity3->entityID)->drawable = modelLoader->createVBO();
+    ecsCoordinator->addComponent<Transform>(entity3->entityID)->position = { 5, -1, 4 };
     glEnable(GL_DEPTH_TEST);
-
 }
 
 double lastTime = 0.0;
@@ -199,6 +204,8 @@ void update() {
 
     //ecsCoordinator->getEntity(0)->getComponent<Transform>()->position.x += (1 * deltaTime);
     ecsCoordinator->getEntity(0)->getComponent<Transform>()->rotation.y += (1 * deltaTime);
+    ecsCoordinator->getEntity(1)->getComponent<Transform>()->rotation.x += (1 * deltaTime);
+    ecsCoordinator->getEntity(2)->getComponent<Transform>()->rotation.z += (1 * deltaTime);
     fpscam->update_cam(deltaTime);
 
 }
