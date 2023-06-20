@@ -9,7 +9,7 @@ struct Component;
 * Used for types in the ECS.
 */
 namespace types {
-	constexpr int MAX_ENTITIES = 500;
+	constexpr int MAX_ENTITIES = 30;
 	constexpr int MAX_COMPONENTS = 32;
 
 	using EntityID = std::uint32_t;

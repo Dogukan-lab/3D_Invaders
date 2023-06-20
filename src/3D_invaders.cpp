@@ -9,6 +9,7 @@
 #include "ECS/core/Mesh.h"
 #include "ECS/core/Transform.h"
 #include "ECS/core/Coordinator.h"
+#include "ECS/core/LightComponent.h"
 #include "ECS/core/TextureComponent.h"
 #include "ECS/systems/RenderSystem.h"
 #include "modelLoader/ModelLoader.h"
@@ -49,8 +50,6 @@ int main(void)
         return -1;
     }
 
-    glfwSetWindowMonitor(glfwWindow, NULL, 0, 0, windowWidth, windowHeight, 60);
-
     /* Make the window's context current */
     glfwMakeContextCurrent(glfwWindow);
     if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
@@ -61,6 +60,8 @@ int main(void)
     tigl::init();
     init();
 
+    glfwSetWindowMonitor(glfwWindow, NULL, 0, 0, windowWidth, windowHeight, 60);
+    glfwSwapInterval(1);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(glfwWindow))
@@ -121,6 +122,8 @@ void init() {
             rotation.y += 1;
 
         });
+
+
 
     fpscam = new FPSCam(glfwWindow);
     modelLoader = new ModelLoader();
@@ -204,9 +207,9 @@ void init() {
     auto& transform4 = ecsCoordinator->addComponent<Transform>(entity4->entityID);
     auto& tex4 = ecsCoordinator->addComponent<TextureComponent>(entity4->entityID);
     tex4->loadTexture("..\\..\\..\\resources\\textures\\Brick_wall.png");
-
     transform4->position = { 0, 6, 0 };
     transform4->scale = { 15, 15, 15 };
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE);
 }

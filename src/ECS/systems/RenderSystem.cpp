@@ -21,12 +21,19 @@ void RenderSystem::draw()
 	tigl::shader->enableLighting(true);
 	tigl::shader->enableColor(true);
 	tigl::shader->setShinyness(20.f);
-	tigl::shader->setLightCount(1);
-	tigl::shader->setLightDirectional(0, true);
-	tigl::shader->setLightPosition(0, { 0, 10, 2 });
+	tigl::shader->setLightCount(2);
+	tigl::shader->setLightDirectional(0, false);
+	tigl::shader->setLightPosition(0, { 0, 5, 10 });
 	tigl::shader->setLightAmbient(0, { .15f, .05f, .1f });
 	tigl::shader->setLightDiffuse(0, { .9f, .9f, .9f });
 	tigl::shader->setLightSpecular(0, { 0.4f, 0.6f, 0.1f });
+
+	tigl::shader->setLightDirectional(1, false);
+	tigl::shader->setLightPosition(1, { -10, 5, -10 });
+	tigl::shader->setLightAmbient(1, { .15f, .05f, .1f });
+	tigl::shader->setLightDiffuse(1, { .9f, .9f, .9f });
+	tigl::shader->setLightSpecular(1, { 0.4f, 0.6f, 0.1f });
+
 
 	tigl::shader->enableFog(true);
 	tigl::shader->setFogColor({ 0.3f, 0.4f, 0.6f });
