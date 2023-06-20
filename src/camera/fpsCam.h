@@ -10,7 +10,11 @@ public:
     FPSCam(GLFWwindow* window);
 
     glm::mat4 getMatrix();
-    void update_cam(float deltaTime);
+    void update_cam(float deltaTime, bool& isStatic);
+
+    inline void setPosition(const glm::vec3& newPos) {
+        this->position = newPos;
+    }
 
 private:
     glm::vec3 position = glm::vec3(0.f);

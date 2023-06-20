@@ -117,15 +117,11 @@ void init() {
     glfwSetKeyCallback(glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
         if (key == GLFW_KEY_ESCAPE)
             glfwSetWindowShouldClose(window, 1);
-
-        if(key == GLFW_KEY_A)
-            rotation.y += 1;
-
         });
 
 
-
     fpscam = new FPSCam(glfwWindow);
+    fpscam->setPosition({ 0, 0, -5 });
     modelLoader = new ModelLoader();
     ecsCoordinator = new Coordinator();
 
@@ -215,21 +211,26 @@ void init() {
 }
 
 double lastTime = 0.0;
+bool frameIsStatic = false;
 
 //TODO Maak een eigen Camera systeem :)
-void update() {   
-    controlPanel->Update(ecsCoordinator);
-    //Hier ECS dingen testen
-
+void update() {
     double currentFrame = glfwGetTime();
     float deltaTime = float(currentFrame - lastTime);
     lastTime = currentFrame;
+
+    if (glfwGetKey(glfwWindow, GLFW_KEY_TAB)) {
+        frameIsStatic = !frameIsStatic;
+    }
+
+    fpscam->update_cam(deltaTime, frameIsStatic);
+    controlPanel->Update(ecsCoordinator, glfwWindow);
+
 
     //ecsCoordinator->getEntity(0)->getComponent<Transform>()->position.x += (1 * deltaTime);
     ecsCoordinator->getEntity(0)->getComponent<Transform>()->rotation.y += (1 * deltaTime);
     ecsCoordinator->getEntity(1)->getComponent<Transform>()->rotation.x += (1 * deltaTime);
     ecsCoordinator->getEntity(2)->getComponent<Transform>()->rotation.z += (1 * deltaTime);
-    fpscam->update_cam(deltaTime);
 
 }
 
