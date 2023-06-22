@@ -22,7 +22,7 @@ ModelLoader* modelLoader;
 
 //struct RenderSystem;
 
-tigl::VBO* cubeVBO;
+//tigl::VBO* cubeVBO;
 
 glm::vec3 rotation(0.f);
 
@@ -33,8 +33,9 @@ int windowWidth = 1280, windowHeight = 1080;
 void init();
 void update();
 void draw();
+void decompose();
 
-int main(void)
+int main()
 {
 
     /* Initialize the library */
@@ -42,7 +43,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    glfwWindow = glfwCreateWindow(windowWidth, windowHeight, "Why are you reading this?!??!", NULL, NULL);
+    glfwWindow = glfwCreateWindow(windowWidth, windowHeight, "Why are you reading this", nullptr, nullptr);
     if (!glfwWindow)
 
     {
@@ -60,7 +61,7 @@ int main(void)
     tigl::init();
     init();
 
-    glfwSetWindowMonitor(glfwWindow, NULL, 0, 0, windowWidth, windowHeight, 60);
+    glfwSetWindowMonitor(glfwWindow, nullptr, 0, 0, windowWidth, windowHeight, 60);
     glfwSwapInterval(1);
 
     /* Loop until the user closes the window */
@@ -75,12 +76,23 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
-    controlPanel->ShutDown();
-    glfwTerminate();
+
+
+    decompose();
     return 0;
 }
 
-void printEntity(std::shared_ptr<Entity> entity) {
+void decompose() {
+    controlPanel->ShutDown();
+    glfwTerminate();
+
+    delete fpscam;
+    delete ecsCoordinator;
+    fpscam = nullptr;
+    ecsCoordinator = nullptr;
+}
+
+void printEntity(const std::shared_ptr<Entity>& entity) {
     if (!entity)
         return;
     std::cout << "Entity ID: " << entity->entityID << std::endl;
@@ -92,11 +104,11 @@ void printEntity(std::shared_ptr<Entity> entity) {
     std::cout << "Entity Signature: " << entity->getSig().to_string() << std::endl;
     
     //Transform debug code
-    /*std::cout << "Transform Position: " << glm::to_string(transform->position) << std::endl;
-    std::cout << "Transform Rotation: " << glm::to_string(transform->rotation) << std::endl;
-    std::cout << "Transform Scale: " << glm::to_string(transform->scale) << std::endl;
-    std::cout << "Component entity ref ID: " << transform->entityRef->entityID << std::endl;*/
-    std::cout << "Entity ID from Mesh: " << entity->getComponent<Mesh>()->entityRef->entityID << std::endl;
+//    std::cout << "Transform Position: " << glm::to_string(transform->position) << std::endl;
+//    std::cout << "Transform Rotation: " << glm::to_string(transform->rotation) << std::endl;
+//    std::cout << "Transform Scale: " << glm::to_string(transform->scale) << std::endl;
+//    std::cout << "Component entity ref ID: " << transform->entityRef->entityID << std::endl;
+//    std::cout << "Entity ID from Mesh: " << entity->getComponent<Mesh>() << std::endl;
 
     std::cout << "\n";
 }
@@ -117,15 +129,11 @@ void init() {
     glfwSetKeyCallback(glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
         if (key == GLFW_KEY_ESCAPE)
             glfwSetWindowShouldClose(window, 1);
-
-        if(key == GLFW_KEY_A)
-            rotation.y += 1;
-
         });
 
 
-
     fpscam = new FPSCam(glfwWindow);
+    fpscam->setPosition({ 0, 0, -5 });
     modelLoader = new ModelLoader();
     ecsCoordinator = new Coordinator();
 
@@ -181,55 +189,63 @@ void init() {
             tigl::Vertex::PT({ -.5f, -.5f, -.5f }, glm::vec2(0*tileSize, 0*tileSize)),
     };
 
-    cubeVBO = tigl::createVbo(quadVertices);
+//    cubeVBO = tigl::createVbo(quadVertices);
 
     tigl::VBO* worldPlane = tigl::createVbo(triangleVertices);
 
     //stressTest(cubeVBO);
     //TODO When demo happens make sure to change absolute path to relative!
-    modelLoader->loadModel("..\\..\\..\\resources\\models\\suzanne.obj");
+    modelLoader->loadModel(R"(../resources/models/suzanne.obj)");
     ecsCoordinator->registerSystem<RenderSystem>();
-    auto& entity = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity->entityID)->drawable = modelLoader->createVBO(); //Deze lijkt redundant als ik toch al entity backref xD
-    ecsCoordinator->addComponent<Transform>(entity->entityID); //Deze lijkt redundant als ik toch al entity backref xD
+    auto entity = ecsCoordinator->createEntity();
+    ecsCoordinator->addComponent<Mesh>(entity)->drawable = modelLoader->createVBO(); //Deze lijkt redundant als ik toch al entity backref xD
+    ecsCoordinator->addComponent<Transform>(entity); //Deze lijkt redundant als ik toch al entity backref xD
     
-    auto& entity2 = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity2->entityID)->drawable = modelLoader->createVBO();
-    ecsCoordinator->addComponent<Transform>(entity2->entityID)->position = {-5, 2, 3};
+    auto entity2 = ecsCoordinator->createEntity();
+    ecsCoordinator->addComponent<Mesh>(entity2)->drawable = modelLoader->createVBO();
+    ecsCoordinator->addComponent<Transform>(entity2)->position = {-5, 2, 3};
 
-    modelLoader->loadModel("..\\..\\..\\resources\\models\\chr_knight.obj");
-    auto& entity3 = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity3->entityID)->drawable = modelLoader->createVBO();
-    ecsCoordinator->addComponent<Transform>(entity3->entityID)->position = { 5, -1, 4 };
+    modelLoader->loadModel(R"(../resources/models/chr_knight.obj)");
+    auto entity3 = ecsCoordinator->createEntity();
+    ecsCoordinator->addComponent<Mesh>(entity3)->drawable = modelLoader->createVBO();
+    ecsCoordinator->addComponent<Transform>(entity3)->position = { 5, -1, 4 };
 
-    auto& entity4 = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity4->entityID)->drawable = worldPlane;
-    auto& transform4 = ecsCoordinator->addComponent<Transform>(entity4->entityID);
-    auto& tex4 = ecsCoordinator->addComponent<TextureComponent>(entity4->entityID);
-    tex4->loadTexture("..\\..\\..\\resources\\textures\\Brick_wall.png");
+    auto entity4 = ecsCoordinator->createEntity();
+    ecsCoordinator->addComponent<Mesh>(entity4)->drawable = worldPlane;
+    auto transform4 = ecsCoordinator->addComponent<Transform>(entity4);
+    auto tex4 = ecsCoordinator->addComponent<TextureComponent>(entity4);
+    tex4->loadTexture(R"(../resources/textures/Brick_wall.png)");
     transform4->position = { 0, 6, 0 };
     transform4->scale = { 15, 15, 15 };
+
+    delete modelLoader;
+    modelLoader = nullptr;
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE);
 }
 
 double lastTime = 0.0;
+bool frameIsStatic = false;
 
 //TODO Maak een eigen Camera systeem :)
-void update() {   
-    controlPanel->Update(ecsCoordinator);
-    //Hier ECS dingen testen
-
+void update() {
     double currentFrame = glfwGetTime();
-    float deltaTime = float(currentFrame - lastTime);
+    auto deltaTime = float(currentFrame - lastTime);
     lastTime = currentFrame;
+
+    if (glfwGetKey(glfwWindow, GLFW_KEY_TAB)) {
+        frameIsStatic = !frameIsStatic;
+    }
+
+    fpscam->update_cam(deltaTime, frameIsStatic);
+    controlPanel->Update(ecsCoordinator, glfwWindow);
+
 
     //ecsCoordinator->getEntity(0)->getComponent<Transform>()->position.x += (1 * deltaTime);
     ecsCoordinator->getEntity(0)->getComponent<Transform>()->rotation.y += (1 * deltaTime);
     ecsCoordinator->getEntity(1)->getComponent<Transform>()->rotation.x += (1 * deltaTime);
     ecsCoordinator->getEntity(2)->getComponent<Transform>()->rotation.z += (1 * deltaTime);
-    fpscam->update_cam(deltaTime);
 
 }
 

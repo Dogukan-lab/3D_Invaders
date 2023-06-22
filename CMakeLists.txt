@@ -9,10 +9,10 @@ if (POLICY CMP0141)
 endif()
 
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(GLFW_LIB ${PROJECT_SOURCE_DIR}/lib/glfw/64-bit/lib-vc2022/glfw3.lib)
+    set(GLFW_LIB ${PROJECT_SOURCE_DIR}/lib/glfw/64-bit/libglfw3.a)
     set(GLFW_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/lib/glfw/64-bit/include)
 else()
-    set(GLFW_LIB ${PROJECT_SOURCE_DIR}/lib/glfw/32-bit/lib-vc2022/glfw3.lib)
+    set(GLFW_LIB ${PROJECT_SOURCE_DIR}/lib/glfw/32-bit/libglfw3.a)
     set(GLFW_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/lib/glfw/32-bit/include)
 endif ()
 

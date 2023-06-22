@@ -24,8 +24,6 @@ public:
 	std::shared_ptr<T> addComponent() {
 		static_assert(std::is_base_of_v<Component, T>, "Type is not of Component base class!");
 		auto ptr = std::make_shared<T>();
-		
-		ptr->setEntityRef(this);
 
 		this->compList[types::getComponentTypeID<T>()] = ptr;
 		this->signature[types::getComponentTypeID<T>()] = true;

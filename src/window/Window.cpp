@@ -4,6 +4,7 @@
 #include "imgui_impl_opengl3.h"
 #include "../ECS/core/Coordinator.h"
 #include "../ECS/core/Transform.h"
+#include <GLFW/glfw3.h>
 #include <io.h>
 #include <optional>
 #include <iostream>
@@ -27,7 +28,7 @@ void Window::NewFrame() {
 
 void EditEntity(std::shared_ptr<Entity> entity) {
     ImGui::Text("Entity ID: %d", entity->entityID);
-    auto& transform = entity->getComponent<Transform>();  
+    auto transform = entity->getComponent<Transform>();
 
     ImGui::Text("Entity: %d, Position", entity->entityID);
     ImGui::SliderFloat(entity->entityID + "  Position X", &transform->position.x, -10, 10);
@@ -40,11 +41,12 @@ void EditEntity(std::shared_ptr<Entity> entity) {
     ImGui::SliderFloat(entity->entityID + "  Rotation Z", &transform->rotation.z, -100, 100);
 }
 
-void Window::Update(Coordinator* coordinator)
+void Window::Update(Coordinator* coordinator, GLFWwindow* window)
 {
     Window::NewFrame();
     //ImGui funstuff.
-    ImGui::Begin("Main Hub");
+    ImGui::SetNextWindowSize(ImVec2(400, 600));
+    ImGui::Begin("Main Hub", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     //ImGui components before render.
 
     // ImGui code

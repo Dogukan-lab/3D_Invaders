@@ -2,6 +2,7 @@
 #include "../core/Entity.h"
 #include "../core/Mesh.h"
 #include "../core/Transform.h"
+#include "../core/LightComponent.h"
 #include "../core/TextureComponent.h"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -44,12 +45,16 @@ void RenderSystem::draw()
 	for (const auto& entity : this->entities) {
 		auto transform = entity->getComponent<Transform>();
 		glm::mat4 modelM = glm::mat4(1.f);
-		auto texture = entity->getComponent<TextureComponent>();
+        auto texture = entity->getComponent<TextureComponent>();
+        auto light = entity->getComponent<LightComponent>();
 		if (texture) {
 			//std::cout << "Entity ID: " << entity->entityID << "Has TEXTURE!" << std::endl;
 			tigl::shader->enableTexture(true);
 			texture->bindTexture();
 		}
+        if(light) {
+            tigl::shader->setLightPosition(0, light->position);
+        }
 
 		modelM = glm::translate(modelM, transform->position);
 		modelM = glm::rotate(modelM, transform->rotation.x, glm::vec3(1, 0, 0));

@@ -9,11 +9,6 @@ class Entity;
 * (Might remove the virtual deconstructor).
 */
 struct Component {
-	Entity* entityRef;
 	~Component() = default;
-
-	void setEntityRef(Entity* ref) {
-		this->entityRef = ref;
-	}
 };
 

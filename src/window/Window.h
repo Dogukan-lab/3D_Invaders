@@ -8,7 +8,7 @@ struct GLFWwindow;
 class Window {
 public:
 	void Init(GLFWwindow* window);
-	virtual void Update(Coordinator* coordinator);
+	virtual void Update(Coordinator* coordinator, GLFWwindow* window);
 	void Render();
 	void ShutDown();
 private:

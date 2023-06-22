@@ -15,20 +15,20 @@ struct Mesh;
 class Coordinator {
 public:
 	Coordinator() {
-		this->entityManager = new EntityManager();
-		this->systemManager = new SystemManager();
+		this->entityManager = std::make_unique<EntityManager>();
+		this->systemManager = std::make_unique<SystemManager>();
 	}
 
 	//TODO if entity types introduced then make this templated!
 	/*
 	* Adds entity to all managers, for now uses a standard entity component preset.
 	*/
-	std::shared_ptr<Entity> createEntity() {
+	types::EntityID& createEntity() {
 		auto entity = this->entityManager->createEntity();
-		return entity;
+		return entity->entityID;
 	}
 
-	std::shared_ptr<Entity> getEntity(const types::EntityID& entityID) {
+	std::shared_ptr<Entity> getEntity(const size_t& entityID) {
 		return this->entityManager->getEntity(entityID);
 	}
 
@@ -36,13 +36,13 @@ public:
 		return this->entityManager->getEntities();
 	}
 
-	void destroyEntity(std::shared_ptr<Entity> entity) {
+	void destroyEntity(const std::shared_ptr<Entity>& entity) {
 		this->entityManager->destroyEntity(entity->entityID);
 		this->systemManager->destroyEntity(entity);
 	}
 
 	template<typename T>
-	std::shared_ptr<T> addComponent(const int& entityID) {
+	std::shared_ptr<T> addComponent(const size_t& entityID) {
 		auto entity = this->entityManager->getEntity(entityID);
 		entity->addComponent<T>();
 		this->systemManager->entitySignatureChanged(entity);
@@ -72,6 +72,6 @@ public:
 	//}
 
 private:
-	EntityManager* entityManager;
-	SystemManager* systemManager;
+	std::unique_ptr<EntityManager> entityManager;
+	std::unique_ptr<SystemManager> systemManager;
 };

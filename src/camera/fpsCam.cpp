@@ -14,10 +14,12 @@ glm::mat4 FPSCam::getMatrix() {
     return ret;
 }
 
-void FPSCam::update_cam(float deltaTime) {
+void FPSCam::update_cam(float deltaTime, bool& isStatic) {
     double x, y;
+    if (isStatic)
+        return;
     glfwGetCursorPos(this->currentWindow, &x, &y);
-
+    
     static double lastX = x;
     static double lastY = y;
 
