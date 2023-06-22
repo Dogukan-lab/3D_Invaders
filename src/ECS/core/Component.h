@@ -5,8 +5,8 @@ class Entity;
 
 /*
 * Base class for all components
-* Virtual deconstructor to have each component ID themselves before begin deleted.
-* (Might remove the virtual deconstructor).
+* Virtual de-constructor to have each component ID themselves before being deleted.
+* (Might remove the virtual de-constructor).
 */
 struct Component {
 	~Component() = default;

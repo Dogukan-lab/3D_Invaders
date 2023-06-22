@@ -8,5 +8,5 @@ struct TextureComponent : public Component {
 	TextureComponent() = default;
 
 	void loadTexture(const char* texturePath);
-	void bindTexture();
+	void bindTexture() const;
 };

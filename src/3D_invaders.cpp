@@ -77,7 +77,6 @@ int main()
         glfwPollEvents();
     }
 
-
     decompose();
     return 0;
 }
@@ -174,8 +173,6 @@ void init() {
         tigl::Vertex::PCTN(glm::vec3(-.5f, -.5f, .5f), glm::vec4(1.f, 1.f, 1.f, 1.f), glm::vec2(0), glm::vec3(0, -1, 0)),
         tigl::Vertex::PCTN(glm::vec3(.5f, -.5f, .5f), glm::vec4(1.f, 1.f, 1.f, 1.f), glm::vec2(0), glm::vec3(0, -1, 0)),
         tigl::Vertex::PCTN(glm::vec3(.5f, -.5f, -.5f), glm::vec4(1.f, 1.f, 1.f, 1.f), glm::vec2(0), glm::vec3(0, -1, 0)),
-
-
     };
 
     //TODO WORLDPLANE GRASS TEXTURE OR SOMETHING IDK

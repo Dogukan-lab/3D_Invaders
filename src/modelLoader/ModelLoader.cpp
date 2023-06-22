@@ -44,6 +44,8 @@ void ModelLoader::loadModel(const std::string& fileName) {
 			this->textureCoords.push_back(texCoord);
 		}
 		else if (prefix == "f") {
+
+            //TODO Make a string splitter for the face data.
 			Face face{};
 			for (int i = 0; i < 3; i++)
 			{

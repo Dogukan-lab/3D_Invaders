@@ -24,7 +24,7 @@ void TextureComponent::loadTexture(const char* texturePath)
     stbi_image_free(imageData);
 }
 
-void TextureComponent::bindTexture()
+void TextureComponent::bindTexture() const
 {
     glBindTexture(GL_TEXTURE_2D, this->textureID);
 }

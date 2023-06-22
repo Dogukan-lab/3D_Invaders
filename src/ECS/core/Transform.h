@@ -11,7 +11,7 @@ struct Transform : public Component {
 	glm::vec3 scale;
 
 	/*
-	* Base constructor which doesnt need parameters.
+	* Base constructor which doesn't need parameters.
 	*/
 	Transform() {
 		this->position = {};
