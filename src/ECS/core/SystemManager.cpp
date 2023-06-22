@@ -1,6 +1,7 @@
 #include "SystemManager.h"
 #include "Entity.h"
 #include <iostream>
+#include <algorithm>
 
 void SystemManager::entitySignatureChanged(std::shared_ptr<Entity> entity)
 {

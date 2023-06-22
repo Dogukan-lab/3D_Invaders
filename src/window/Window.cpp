@@ -28,7 +28,7 @@ void Window::NewFrame() {
 
 void EditEntity(std::shared_ptr<Entity> entity) {
     ImGui::Text("Entity ID: %d", entity->entityID);
-    auto& transform = entity->getComponent<Transform>();  
+    auto transform = entity->getComponent<Transform>();
 
     ImGui::Text("Entity: %d, Position", entity->entityID);
     ImGui::SliderFloat(entity->entityID + "  Position X", &transform->position.x, -10, 10);
