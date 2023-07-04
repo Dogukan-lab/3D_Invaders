@@ -13,6 +13,9 @@
 #include "ECS/core/TextureComponent.h"
 #include "ECS/systems/RenderSystem.h"
 #include "modelLoader/ModelLoader.h"
+#include "UnitTester.h"
+
+#define TESTING 0
 
 GLFWwindow* glfwWindow;
 std::unique_ptr<Window> controlPanel = std::make_unique<Window>();
@@ -37,7 +40,7 @@ void decompose();
 
 int main()
 {
-
+#if TESTING
     /* Initialize the library */
     if (!glfwInit())
         return -1;
@@ -61,7 +64,6 @@ int main()
     tigl::init();
     init();
 
-    glfwSetWindowMonitor(glfwWindow, nullptr, 0, 0, windowWidth, windowHeight, 60);
     glfwSwapInterval(1);
 
     /* Loop until the user closes the window */
@@ -79,16 +81,20 @@ int main()
 
     decompose();
     return 0;
+#endif
+
+    return UnitTester::startTests();
+
 }
 
 void decompose() {
-    controlPanel->ShutDown();
-    glfwTerminate();
-
     delete fpscam;
     delete ecsCoordinator;
     fpscam = nullptr;
     ecsCoordinator = nullptr;
+
+    controlPanel->ShutDown();
+    glfwTerminate();
 }
 
 void printEntity(const std::shared_ptr<Entity>& entity) {
@@ -133,7 +139,7 @@ void init() {
 
     fpscam = new FPSCam(glfwWindow);
     fpscam->setPosition({ 0, 0, -5 });
-    modelLoader = new ModelLoader();
+    modelLoader = new ModelLoader(); //Dit wordt niet opgeschoond, dus maak unique_ptrs of anders gewoon smart pointers.
     ecsCoordinator = new Coordinator();
 
     
@@ -214,9 +220,6 @@ void init() {
     tex4->loadTexture(R"(../resources/textures/Brick_wall.png)");
     transform4->position = { 0, 6, 0 };
     transform4->scale = { 15, 15, 15 };
-
-    delete modelLoader;
-    modelLoader = nullptr;
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE);

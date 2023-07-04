@@ -1,0 +1,16 @@
+[TEST SUITE START] 0 Test start Timestamp: 1688488388354
+[TEST START] ECSTest.CreateEntity
+[END OF TEST] PASSED: ECSTest.CreateEntity
+[TEST START] ECSTest.AddTransform
+[END OF TEST] PASSED: ECSTest.AddTransform
+[TEST START] ECSTest.AddMesh
+[END OF TEST] PASSED: ECSTest.AddMesh
+[TEST START] ECSTest.DeleteComponent
+[END OF TEST] PASSED: ECSTest.DeleteComponent
+[TEST START] ECSTest.RegisterSystem
+[END OF TEST] PASSED: ECSTest.RegisterSystem
+[TEST START] ECSTest.AddEntityToSystem
+[END OF TEST] PASSED: ECSTest.AddEntityToSystem
+[TEST START] ECSTest.RemoveEntityFromSystem
+[END OF TEST] PASSED: ECSTest.RemoveEntityFromSystem
+[TEST SUITE END] 0 Amount of test succes: 7 Amount of test failures: 0
