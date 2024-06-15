@@ -6,6 +6,8 @@
 #include "../core/TextureComponent.h"
 #include "glm/gtc/matrix_transform.hpp"
 
+//TODO Make shader compile function for setting up the shader necessary.
+//TODO Cache created shader programs???
 RenderSystem::RenderSystem()
 {
 	this->entities = {};
@@ -41,12 +43,12 @@ void RenderSystem::draw()
 	tigl::shader->setFogExp2(.25f);
 	//tigl::shader->enableTexture(true);
 
-	//TODO Lighcomponent so you can move it around n shiet.
+	//TODO Lighcomponent so you can move it around.
 	for (const auto& entity : this->entities) {
-		auto transform = entity->getComponent<Transform>();
+		auto transform = entity->getComponent<Transform>().lock();
 		glm::mat4 modelM = glm::mat4(1.f);
-        auto texture = entity->getComponent<TextureComponent>();
-        auto light = entity->getComponent<LightComponent>();
+        auto texture = entity->getComponent<TextureComponent>().lock();
+        auto light = entity->getComponent<LightComponent>().lock();
 		if (texture) {
 			//std::cout << "Entity ID: " << entity->entityID << "Has TEXTURE!" << std::endl;
 			tigl::shader->enableTexture(true);
@@ -62,7 +64,7 @@ void RenderSystem::draw()
 		modelM = glm::rotate(modelM, transform->rotation.z, glm::vec3(0, 0, 1));
 		modelM = glm::scale(modelM, transform->scale);
 		tigl::shader->setModelMatrix(modelM);
-		tigl::drawVertices(GL_TRIANGLES, entity->getComponent<Mesh>()->drawable);
+		tigl::drawVertices(GL_TRIANGLES, entity->getComponent<Mesh>().lock()->drawable);
 		tigl::shader->enableTexture(false);
 	}
 }

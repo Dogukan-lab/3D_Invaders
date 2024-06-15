@@ -9,6 +9,6 @@ class Entity;
 * (Might remove the virtual de-constructor).
 */
 struct Component {
-	~Component() = default;
+	virtual ~Component() = default;
 };
 

@@ -62,7 +62,7 @@ add_executable (${PROJECT_NAME} "src/3D_invaders.cpp"
         "src/modelLoader/ModelLoader.cpp"
         "UnitTests/ECSTest.cpp"
         "UnitTests/UnitTester.cpp"
-    )
+        src/modelLoader/Object_loader.cpp src/modelLoader/Object_loader.h)
 
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)

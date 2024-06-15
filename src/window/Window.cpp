@@ -30,15 +30,17 @@ void EditEntity(std::shared_ptr<Entity> entity) {
     ImGui::Text("Entity ID: %d", entity->entityID);
     auto transform = entity->getComponent<Transform>();
 
+    if(transform.expired())
+        std::cerr << "Transform component not found!" << std::endl;
     ImGui::Text("Entity: %d, Position", entity->entityID);
-    ImGui::SliderFloat(entity->entityID + "  Position X", &transform->position.x, -10, 10);
-    ImGui::SliderFloat(entity->entityID + "  Position Y", &transform->position.y, -10, 10);
-    ImGui::SliderFloat(entity->entityID + "  Position Z", &transform->position.z, -10, 10);
+    ImGui::SliderFloat(entity->entityID + "  Position X", &transform.lock()->position.x, -10, 10);
+    ImGui::SliderFloat(entity->entityID + "  Position Y", &transform.lock()->position.y, -10, 10);
+    ImGui::SliderFloat(entity->entityID + "  Position Z", &transform.lock()->position.z, -10, 10);
 
     ImGui::Text("Entity: %d, Rotation", entity->entityID);
-    ImGui::SliderFloat(entity->entityID + "  Rotation X", &transform->rotation.x, -100, 100);
-    ImGui::SliderFloat(entity->entityID + "  Rotation Y", &transform->rotation.y, -100, 100);
-    ImGui::SliderFloat(entity->entityID + "  Rotation Z", &transform->rotation.z, -100, 100);
+    ImGui::SliderFloat(entity->entityID + "  Rotation X", &transform.lock()->rotation.x, -100, 100);
+    ImGui::SliderFloat(entity->entityID + "  Rotation Y", &transform.lock()->rotation.y, -100, 100);
+    ImGui::SliderFloat(entity->entityID + "  Rotation Z", &transform.lock()->rotation.z, -100, 100);
 }
 
 void Window::Update(Coordinator* coordinator, GLFWwindow* window)

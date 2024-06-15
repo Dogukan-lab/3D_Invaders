@@ -2,6 +2,7 @@
 
 #include "EntityManager.h"
 #include "SystemManager.h"
+#include <iostream>
 
 struct Transform;
 struct Mesh;
@@ -12,6 +13,7 @@ struct Mesh;
 * Remove entity type from all necessary managers.
 * May modify components if implemented.
 */
+
 class Coordinator {
 public:
 	Coordinator() {
@@ -19,16 +21,15 @@ public:
 		this->systemManager = std::make_unique<SystemManager>();
 	}
 
-	//TODO if entity types introduced then make this templated!
 	/*
 	* Adds entity to all managers, for now uses a standard entity component preset.
 	*/
 	types::EntityID& createEntity() {
-		auto entity = this->entityManager->createEntity();
+		auto entity = this->entityManager->createEntity().lock();
 		return entity->entityID;
 	}
 
-	std::shared_ptr<Entity> getEntity(const size_t& entityID) {
+	std::weak_ptr<Entity> getEntity(const size_t& entityID) {
 		return this->entityManager->getEntity(entityID);
 	}
 
@@ -42,8 +43,8 @@ public:
 	}
 
 	template<typename T>
-	std::shared_ptr<T> addComponent(const size_t& entityID) {
-		auto entity = this->entityManager->getEntity(entityID);
+	std::weak_ptr<T> addComponent(const size_t& entityID) {
+		auto entity = this->entityManager->getEntity(entityID).lock();
 		entity->addComponent<T>();
 		this->systemManager->entitySignatureChanged(entity);
 		return entity->getComponent<T>();
@@ -51,18 +52,20 @@ public:
 
 	template<typename T>
 	void removeComponent(const types::EntityID& entityID) {
-		auto entity = this->entityManager->getEntity(entityID);
+        if(this->entityManager->getEntity(entityID).expired())
+            std::cerr << "Specified entity is no longer accessible" << std::endl;
+		auto entity = this->entityManager->getEntity(entityID).lock();
 		entity->deleteComponent<T>();
 		this->systemManager->entitySignatureChanged(entity);
 	}
 
 	template<typename T>
-	std::shared_ptr<T> registerSystem() {
+	std::weak_ptr<T> registerSystem() {
 		return this->systemManager->registerSystem<T>();
 	}
 	
 	template<typename T>
-	std::shared_ptr<T> getSystem() {
+	std::weak_ptr<T> getSystem() {
 		return this->systemManager->getSystem<T>();
 	}
 

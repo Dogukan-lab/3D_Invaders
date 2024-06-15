@@ -10,6 +10,11 @@ struct Mesh : public Component {
 		this->drawable = nullptr;
 	}
 
+    ~Mesh() {
+        this->drawable = nullptr;
+        delete this->drawable;
+    }
+
 	void setMesh(tigl::VBO* vbo) {
 		this->drawable = vbo;
 	}

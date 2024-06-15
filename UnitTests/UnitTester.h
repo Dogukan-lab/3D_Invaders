@@ -1,8 +1,5 @@
 #pragma once
 
-class UnitTester {
-public:
-    UnitTester() = default;
-
+namespace UnitTester {
     static int startTests();
 };

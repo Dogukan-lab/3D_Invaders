@@ -17,6 +17,7 @@
 
 #define TESTING 0
 
+//TODO Refactor these raw pointers!
 GLFWwindow* glfwWindow;
 std::unique_ptr<Window> controlPanel = std::make_unique<Window>();
 FPSCam* fpscam;
@@ -41,6 +42,9 @@ void decompose();
 int main()
 {
 #if TESTING
+    return UnitTester::startTests();
+#endif
+
     /* Initialize the library */
     if (!glfwInit())
         return -1;
@@ -81,9 +85,7 @@ int main()
 
     decompose();
     return 0;
-#endif
 
-    return UnitTester::startTests();
 
 }
 
@@ -97,16 +99,16 @@ void decompose() {
     glfwTerminate();
 }
 
-void printEntity(const std::shared_ptr<Entity>& entity) {
-    if (!entity)
+void printEntity(const std::weak_ptr<Entity>& entity) {
+    if (entity.expired())
         return;
-    std::cout << "Entity ID: " << entity->entityID << std::endl;
+    std::cout << "Entity ID: " << entity.lock()->entityID << std::endl;
 
    /* auto transform = entity->getComponent<Transform>();
     if (!transform)
         return;*/
 
-    std::cout << "Entity Signature: " << entity->getSig().to_string() << std::endl;
+    std::cout << "Entity Signature: " << entity.lock()->getSig().to_string() << std::endl;
     
     //Transform debug code
 //    std::cout << "Transform Position: " << glm::to_string(transform->position) << std::endl;
@@ -123,7 +125,7 @@ void stressTest(tigl::VBO* vbo) {
         auto entity = ecsCoordinator->createEntity();
     }
 
-    ecsCoordinator->getEntity(2)->addComponent<Mesh>()->setMesh(vbo);
+    ecsCoordinator->getEntity(2).lock()->addComponent<Mesh>().lock()->setMesh(vbo);
     printEntity(ecsCoordinator->getEntity(2));
 }
 
@@ -201,25 +203,27 @@ void init() {
     modelLoader->loadModel(R"(../resources/models/suzanne.obj)");
     ecsCoordinator->registerSystem<RenderSystem>();
     auto entity = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity)->drawable = modelLoader->createVBO(); //Deze lijkt redundant als ik toch al entity backref xD
+    ecsCoordinator->addComponent<Mesh>(entity).lock()->drawable = modelLoader->createVBO(); //Deze lijkt redundant als ik toch al entity backref xD
     ecsCoordinator->addComponent<Transform>(entity); //Deze lijkt redundant als ik toch al entity backref xD
     
     auto entity2 = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity2)->drawable = modelLoader->createVBO();
-    ecsCoordinator->addComponent<Transform>(entity2)->position = {-5, 2, 3};
+    ecsCoordinator->addComponent<Mesh>(entity2).lock()->drawable = modelLoader->createVBO();
+    ecsCoordinator->addComponent<Transform>(entity2).lock()->position = {-5, 2, 3};
 
     modelLoader->loadModel(R"(../resources/models/chr_knight.obj)");
     auto entity3 = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity3)->drawable = modelLoader->createVBO();
-    ecsCoordinator->addComponent<Transform>(entity3)->position = { 5, -1, 4 };
+    ecsCoordinator->addComponent<Mesh>(entity3).lock()->drawable = modelLoader->createVBO();
+    ecsCoordinator->addComponent<Transform>(entity3).lock()->position = { 5, -1, 4 };
 
     auto entity4 = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity4)->drawable = worldPlane;
-    auto transform4 = ecsCoordinator->addComponent<Transform>(entity4);
-    auto tex4 = ecsCoordinator->addComponent<TextureComponent>(entity4);
-    tex4->loadTexture(R"(../resources/textures/Brick_wall.png)");
-    transform4->position = { 0, 6, 0 };
-    transform4->scale = { 15, 15, 15 };
+    ecsCoordinator->addComponent<Mesh>(entity4).lock()->drawable = worldPlane;
+    if(auto transform4 = ecsCoordinator->addComponent<Transform>(entity4).lock()) {
+        transform4->position = { 0, 6, 0 };
+        transform4->scale = { 15, 15, 15 };
+    }
+
+    if(auto tex4 = ecsCoordinator->addComponent<TextureComponent>(entity4).lock())
+        tex4->loadTexture(R"(../resources/textures/Brick_wall.png)");
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE);
@@ -243,9 +247,9 @@ void update() {
 
 
     //ecsCoordinator->getEntity(0)->getComponent<Transform>()->position.x += (1 * deltaTime);
-    ecsCoordinator->getEntity(0)->getComponent<Transform>()->rotation.y += (1 * deltaTime);
-    ecsCoordinator->getEntity(1)->getComponent<Transform>()->rotation.x += (1 * deltaTime);
-    ecsCoordinator->getEntity(2)->getComponent<Transform>()->rotation.z += (1 * deltaTime);
+    ecsCoordinator->getEntity(0).lock()->getComponent<Transform>().lock()->rotation.y += (1 * deltaTime);
+    ecsCoordinator->getEntity(1).lock()->getComponent<Transform>().lock()->rotation.x += (1 * deltaTime);
+    ecsCoordinator->getEntity(2).lock()->getComponent<Transform>().lock()->rotation.z += (1 * deltaTime);
 
 }
 
@@ -265,6 +269,6 @@ void draw() {
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    ecsCoordinator->getSystem<RenderSystem>()->draw();
+    ecsCoordinator->getSystem<RenderSystem>().lock()->draw();
     controlPanel->Render();
 }

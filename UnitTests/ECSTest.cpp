@@ -3,7 +3,6 @@
 #include "Mesh.h"
 #include "../src/ECS/systems/RenderSystem.h"
 
-
 TEST_F(ECSTest, CreateEntity) {
     auto entityID = this->ecsCoordinator->createEntity();
 
@@ -13,16 +12,16 @@ TEST_F(ECSTest, CreateEntity) {
 
 TEST_F(ECSTest, AddTransform) {
     auto entityID = this->ecsCoordinator->createEntity();
-    const auto& actualComp = this->ecsCoordinator->addComponent<Transform>(entityID);
+    auto actualComp = this->ecsCoordinator->addComponent<Transform>(entityID);
 
-    EXPECT_NE(actualComp, nullptr);
+    EXPECT_NE(actualComp.expired(), false);
 }
 
 TEST_F(ECSTest, AddMesh) {
     auto entityID = this->ecsCoordinator->createEntity();
-    const auto& mesh = this->ecsCoordinator->addComponent<Mesh>(entityID);
+    auto mesh = this->ecsCoordinator->addComponent<Mesh>(entityID);
 
-    EXPECT_NE(mesh, nullptr);
+    EXPECT_NE(mesh.expired(), true);
 }
 
 // Test case niet mogelijk, doordat static_assert dit al afvangt.
@@ -35,23 +34,23 @@ TEST_F(ECSTest, DeleteComponent) {
     auto entityID = this->ecsCoordinator->createEntity();
     this->ecsCoordinator->addComponent<Transform>(entityID);
     this->ecsCoordinator->removeComponent<Transform>(entityID);
-    const auto& transform = this->ecsCoordinator->getEntity(entityID)->getComponent<Transform>();
+    auto transform = this->ecsCoordinator->getEntity(entityID).lock()->getComponent<Transform>();
 
-    ASSERT_EQ(nullptr, transform);
+    ASSERT_EQ(false, transform.expired());
 }
 
 TEST_F(ECSTest, RegisterSystem) {
     const auto& system = this->ecsCoordinator->registerSystem<RenderSystem>(); //Dit testen
-    EXPECT_NE(system, nullptr);
+    EXPECT_NE(system.expired(), true);
 }
 
 TEST_F(ECSTest, AddEntityToSystem) {
     const auto& system = this->ecsCoordinator->registerSystem<RenderSystem>();
     auto entityID = this->ecsCoordinator->createEntity();
     this->ecsCoordinator->addComponent<Transform>(entityID); //Dit moet falen
-    EXPECT_NE(system->systemSignature, this->ecsCoordinator->getEntity(entityID)->getSig());
-    this->ecsCoordinator->addComponent<Mesh>(entityID); //Dit moet succeeden
-    EXPECT_EQ(this->ecsCoordinator->getEntity(entityID)->getSig(), system->systemSignature);
+    EXPECT_NE(system.lock()->systemSignature, this->ecsCoordinator->getEntity(entityID).lock()->getSig());
+    this->ecsCoordinator->addComponent<Mesh>(entityID); //Dit moet slagen
+    EXPECT_EQ(this->ecsCoordinator->getEntity(entityID).lock()->getSig(), system.lock()->systemSignature);
 }
 
 TEST_F(ECSTest, RemoveEntityFromSystem) {
@@ -60,8 +59,8 @@ TEST_F(ECSTest, RemoveEntityFromSystem) {
     this->ecsCoordinator->addComponent<Transform>(entityID);
     this->ecsCoordinator->addComponent<Mesh>(entityID);
 
-    this->ecsCoordinator->destroyEntity(this->ecsCoordinator->getEntity(entityID)); //Dit testen
+    this->ecsCoordinator->destroyEntity(this->ecsCoordinator->getEntity(entityID).lock()); //Dit testen
     const auto& entity = this->ecsCoordinator->getEntity(entityID);
 
-    EXPECT_EQ(nullptr, entity);
+    EXPECT_EQ(true, entity.expired());
 }
