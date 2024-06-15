@@ -20,13 +20,9 @@
 //TODO Refactor these raw pointers!
 GLFWwindow* glfwWindow;
 std::unique_ptr<Window> controlPanel = std::make_unique<Window>();
-FPSCam* fpscam;
-Coordinator* ecsCoordinator;
-ModelLoader* modelLoader;
-
-//struct RenderSystem;
-
-//tigl::VBO* cubeVBO;
+std::unique_ptr<FPSCam> fpscam;
+std::shared_ptr<Coordinator> ecsCoordinator;
+std::unique_ptr<ModelLoader> modelLoader;
 
 glm::vec3 rotation(0.f);
 
@@ -90,11 +86,6 @@ int main()
 }
 
 void decompose() {
-    delete fpscam;
-    delete ecsCoordinator;
-    fpscam = nullptr;
-    ecsCoordinator = nullptr;
-
     controlPanel->ShutDown();
     glfwTerminate();
 }
@@ -120,7 +111,7 @@ void printEntity(const std::weak_ptr<Entity>& entity) {
     std::cout << "\n";
 }
 
-void stressTest(tigl::VBO* vbo) {
+void stressTest(std::shared_ptr<tigl::VBO> vbo) {
     for (int i = 0; i < types::MAX_ENTITIES; i++) {
         auto entity = ecsCoordinator->createEntity();
     }
@@ -139,12 +130,11 @@ void init() {
         });
 
 
-    fpscam = new FPSCam(glfwWindow);
+    fpscam = std::make_unique<FPSCam>(glfwWindow);
     fpscam->setPosition({ 0, 0, -5 });
-    modelLoader = new ModelLoader(); //Dit wordt niet opgeschoond, dus maak unique_ptrs of anders gewoon smart pointers.
-    ecsCoordinator = new Coordinator();
+    modelLoader = std::make_unique<ModelLoader>(); //Dit wordt niet opgeschoond, dus maak unique_ptrs of anders gewoon smart pointers.
+    ecsCoordinator = std::make_unique<Coordinator>();
 
-    
     std::vector<tigl::Vertex> quadVertices = {  
         //Face of cube GREEN
         tigl::Vertex::PCTN(glm::vec3(-.5f, .5f, -.5f), glm::vec4(0.f, .5f, .0f, 1.f), glm::vec2(0), glm::vec3(0, 0, 1)),
@@ -194,9 +184,8 @@ void init() {
             tigl::Vertex::PT({ -.5f, -.5f, -.5f }, glm::vec2(0*tileSize, 0*tileSize)),
     };
 
-//    cubeVBO = tigl::createVbo(quadVertices);
-
-    tigl::VBO* worldPlane = tigl::createVbo(triangleVertices);
+    std::shared_ptr<tigl::VBO> worldPlane;
+    worldPlane.reset(tigl::createVbo(triangleVertices));
 
     //stressTest(cubeVBO);
     //TODO When demo happens make sure to change absolute path to relative!

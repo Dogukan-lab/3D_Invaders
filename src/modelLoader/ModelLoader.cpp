@@ -67,7 +67,7 @@ void ModelLoader::loadModel(const std::string& fileName) {
 	fileStream.close();
 }
 
-tigl::VBO* ModelLoader::createVBO() {
+std::shared_ptr<tigl::VBO> ModelLoader::createVBO() {
 	std::vector<tigl::Vertex> vertices;
 
 	//Load everything into the vertex;
@@ -82,7 +82,9 @@ tigl::VBO* ModelLoader::createVBO() {
 		}
 	}
 
-	tigl::VBO* modelVBO = tigl::createVbo(vertices);
+    std::shared_ptr<tigl::VBO> modelVBO;
+    modelVBO.reset(tigl::createVbo(vertices));
+
 	vertices.clear();
 	return modelVBO;
 }

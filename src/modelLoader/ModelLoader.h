@@ -14,7 +14,7 @@ public:
 	void loadModel(const std::string& fileName);
 
 	//After extracting the 3D data, combine it into vertices to render later on.
-	tigl::VBO* createVBO();
+	std::shared_ptr<tigl::VBO> createVBO();
 
 private:
 	//void addPosition();

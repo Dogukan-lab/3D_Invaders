@@ -64,7 +64,7 @@ void RenderSystem::draw()
 		modelM = glm::rotate(modelM, transform->rotation.z, glm::vec3(0, 0, 1));
 		modelM = glm::scale(modelM, transform->scale);
 		tigl::shader->setModelMatrix(modelM);
-		tigl::drawVertices(GL_TRIANGLES, entity->getComponent<Mesh>().lock()->drawable);
+		tigl::drawVertices(GL_TRIANGLES, entity->getComponent<Mesh>().lock()->drawable.get());
 		tigl::shader->enableTexture(false);
 	}
 }

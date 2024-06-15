@@ -43,7 +43,7 @@ void EditEntity(std::shared_ptr<Entity> entity) {
     ImGui::SliderFloat(entity->entityID + "  Rotation Z", &transform.lock()->rotation.z, -100, 100);
 }
 
-void Window::Update(Coordinator* coordinator, GLFWwindow* window)
+void Window::Update(std::weak_ptr<Coordinator> coordinator, GLFWwindow* window)
 {
     Window::NewFrame();
     //ImGui funstuff.
@@ -52,7 +52,7 @@ void Window::Update(Coordinator* coordinator, GLFWwindow* window)
     //ImGui components before render.
 
     // ImGui code
-    for (const auto& entityPair : coordinator->getEntities()) {
+    for (const auto& entityPair : coordinator.lock()->getEntities()) {
         auto& entity = entityPair.second;
         EditEntity(entity);
         ImGui::Separator();

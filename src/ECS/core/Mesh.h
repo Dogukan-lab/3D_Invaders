@@ -3,7 +3,7 @@
 #include "tigl.h"
 
 struct Mesh : public Component {
-	tigl::VBO* drawable; //TODO make this a unique ptr??
+	std::shared_ptr<tigl::VBO> drawable; //TODO make this a unique ptr??
 
 	Mesh() {
 		std::cout << "Mesh has been created!" << std::endl;
@@ -11,11 +11,10 @@ struct Mesh : public Component {
 	}
 
     ~Mesh() {
-        this->drawable = nullptr;
-        delete this->drawable;
+        drawable = nullptr;
     }
 
-	void setMesh(tigl::VBO* vbo) {
+	void setMesh(const std::shared_ptr<tigl::VBO>& vbo) {
 		this->drawable = vbo;
 	}
 };
