@@ -12,10 +12,10 @@
 #include "Material.h"
 
 struct Face {
-    std::vector<int> vertexIndices;
-    std::vector<int> texCoordIndices;
-    std::vector<int> normalIndices;
-    std::string materialName;
+    std::vector<int> vertexIndices{};
+    std::vector<int> texCoordIndices{};
+    std::vector<int> normalIndices{};
+    std::string materialName{};
     int smoothingGroup;
 };
 
@@ -39,5 +39,5 @@ private:
     void parseVertex(std::istringstream& stringStream);
     void parseTexture(std::istringstream& stringStream);
     void parseNormal(std::istringstream& stringStream);
-    static void parseFace(std::istringstream& stringStream);
+    void parseFace(std::istringstream& stringStream);
 };
