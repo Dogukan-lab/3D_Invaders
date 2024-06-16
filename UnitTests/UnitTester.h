@@ -1,5 +1,5 @@
 #pragma once
 
-namespace UnitTester {
+struct UnitTester {
     static int startTests();
 };

@@ -1,4 +1,4 @@
-[TEST SUITE START] 0 Test start Timestamp: 1718454752309
+[TEST SUITE START] 0 Test start Timestamp: 1718530358812
 [TEST START] ECSTest.CreateEntity
 [END OF TEST] PASSED: ECSTest.CreateEntity
 [TEST START] ECSTest.AddTransform

@@ -14,8 +14,10 @@
 #include "ECS/systems/RenderSystem.h"
 #include "modelLoader/ModelLoader.h"
 #include "UnitTester.h"
+#include "modelLoader/ObjectLoader.h"
 
 #define TESTING 0
+#define OBJLOADER 0
 
 //TODO Refactor these raw pointers!
 GLFWwindow* glfwWindow;
@@ -24,13 +26,18 @@ std::unique_ptr<FPSCam> fpscam;
 std::shared_ptr<Coordinator> ecsCoordinator;
 std::unique_ptr<ModelLoader> modelLoader;
 
+std::shared_ptr<tigl::VBO> vbo;
+std::shared_ptr<tigl::VBO> worldPlane;
+
 glm::vec3 rotation(0.f);
 
 int viewport[4];
 
 int windowWidth = 1280, windowHeight = 1080;
+constexpr float tileSize = 32.f;
 
 void init();
+void testObjLoader();
 void update();
 void draw();
 void decompose();
@@ -39,6 +46,10 @@ int main()
 {
 #if TESTING
     return UnitTester::startTests();
+#endif
+#if OBJLOADER
+    testObjLoader();
+    return 0;
 #endif
 
     /* Initialize the library */
@@ -62,8 +73,8 @@ int main()
     }
 
     tigl::init();
-    init();
-
+    testObjLoader();
+//    init();
     glfwSwapInterval(1);
 
     /* Loop until the user closes the window */
@@ -79,7 +90,7 @@ int main()
         glfwPollEvents();
     }
 
-    decompose();
+//    decompose();
     return 0;
 
 
@@ -88,6 +99,30 @@ int main()
 void decompose() {
     controlPanel->ShutDown();
     glfwTerminate();
+}
+
+void testObjLoader() {
+    glfwSetKeyCallback(glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+        if (key == GLFW_KEY_ESCAPE)
+            glfwSetWindowShouldClose(window, 1);
+    });
+    std::vector<tigl::Vertex> triangleVertices {
+            tigl::Vertex::PT({ -.5f, -.5f, .5f }, glm::vec2(0 * tileSize, 0*tileSize)),
+            tigl::Vertex::PT({ -.5f, -.5f, -.5f }, glm::vec2(0*tileSize, 0*tileSize)),
+            tigl::Vertex::PT({ .5f, -.5f, .5f}, glm::vec2(1*tileSize, 0*tileSize)),
+
+            tigl::Vertex::PT({ .5f, -.5f, .5f }, glm::vec2(1*tileSize, 0*tileSize)),
+            tigl::Vertex::PT({ .5f, -.5f, -.5f }, glm::vec2(1*tileSize, 0*tileSize)),
+            tigl::Vertex::PT({ -.5f, -.5f, -.5f }, glm::vec2(0*tileSize, 0*tileSize)),
+    };
+
+    worldPlane.reset(tigl::createVbo(triangleVertices));
+
+    fpscam = std::make_unique<FPSCam>(glfwWindow);
+    fpscam->setPosition({ 0, 0, -5 });
+    ObjectLoader loader("../resources/spaceship/lowpoly_spaceship.obj");
+//    loader.parseMaterial("lowpoly_spaceship.mtl");
+    vbo = loader.createVBO();
 }
 
 void printEntity(const std::weak_ptr<Entity>& entity) {
@@ -120,7 +155,6 @@ void stressTest(std::shared_ptr<tigl::VBO> vbo) {
     printEntity(ecsCoordinator->getEntity(2));
 }
 
-const float tileSize = 32.f;
 
 void init() {
     controlPanel->Init(glfwWindow);
@@ -128,7 +162,6 @@ void init() {
         if (key == GLFW_KEY_ESCAPE)
             glfwSetWindowShouldClose(window, 1);
         });
-
 
     fpscam = std::make_unique<FPSCam>(glfwWindow);
     fpscam->setPosition({ 0, 0, -5 });
@@ -232,14 +265,13 @@ void update() {
     }
 
     fpscam->update_cam(deltaTime, frameIsStatic);
-    controlPanel->Update(ecsCoordinator, glfwWindow);
+//    controlPanel->Update(ecsCoordinator, glfwWindow);
 
 
     //ecsCoordinator->getEntity(0)->getComponent<Transform>()->position.x += (1 * deltaTime);
-    ecsCoordinator->getEntity(0).lock()->getComponent<Transform>().lock()->rotation.y += (1 * deltaTime);
-    ecsCoordinator->getEntity(1).lock()->getComponent<Transform>().lock()->rotation.x += (1 * deltaTime);
-    ecsCoordinator->getEntity(2).lock()->getComponent<Transform>().lock()->rotation.z += (1 * deltaTime);
-
+//    ecsCoordinator->getEntity(0).lock()->getComponent<Transform>().lock()->rotation.y += (1 * deltaTime);
+//    ecsCoordinator->getEntity(1).lock()->getComponent<Transform>().lock()->rotation.x += (1 * deltaTime);
+//    ecsCoordinator->getEntity(2).lock()->getComponent<Transform>().lock()->rotation.z += (1 * deltaTime);
 }
 
 void draw() {
@@ -248,16 +280,28 @@ void draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
 
+    //Camera setup before drawing.
     tigl::shader->setProjectionMatrix(
         glm::perspective(glm::radians(75.0f), viewport[2] / (float)viewport[3], 0.01f, 100.f)
     );
     tigl::shader->setViewMatrix(fpscam->getMatrix());
     tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
+    //Set light
+//    tigl::shader->setLightDirectional(0, false);
+    //Set diffuse and so on.
+//    tigl::shader->setLightDiffuse(0, glm::vec3(0));
+    tigl::shader->enableLighting(false);
+    //Draw faces from obj loader
+    tigl::drawVertices(GL_TRIANGLES, worldPlane.get());
+
+    tigl::drawVertices(GL_TRIANGLES, vbo.get());
+
+
     //tigl::shader->enableColor(true);
 
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    ecsCoordinator->getSystem<RenderSystem>().lock()->draw();
-    controlPanel->Render();
+//    ImGui::Render();
+//    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+//    ecsCoordinator->getSystem<RenderSystem>().lock()->draw();
+//    controlPanel->Render();
 }

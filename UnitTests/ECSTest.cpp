@@ -14,7 +14,7 @@ TEST_F(ECSTest, AddTransform) {
     auto entityID = this->ecsCoordinator->createEntity();
     auto actualComp = this->ecsCoordinator->addComponent<Transform>(entityID);
 
-    EXPECT_NE(actualComp.expired(), false);
+    EXPECT_NE(actualComp.expired(), true);
 }
 
 TEST_F(ECSTest, AddMesh) {
@@ -36,7 +36,7 @@ TEST_F(ECSTest, DeleteComponent) {
     this->ecsCoordinator->removeComponent<Transform>(entityID);
     auto transform = this->ecsCoordinator->getEntity(entityID).lock()->getComponent<Transform>();
 
-    ASSERT_EQ(false, transform.expired());
+    ASSERT_EQ(transform.expired(), true);
 }
 
 TEST_F(ECSTest, RegisterSystem) {
