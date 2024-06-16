@@ -122,52 +122,54 @@ void ObjectLoader::parseMaterial(const std::string &fileName) {
     materialFile.close();
 }
 
-void ObjectLoader::parseFace(std::istringstream &stringStream) {
-    Face face;
-//    std::cout << stringStream.str() << std::endl;
-
-    //4 faces total
-    //Need to be two tri's
-    //123 & 234
-    std::string faceString;
-    while(stringStream >> faceString) {
-        std::istringstream faceSs(faceString);
-        std::string indexString;
-        int indices[3] = {0,0,0};
-        //Single part of face.
-//        std::cout << "FACE STRING: " << faceString << "\n";
-        int i = 0;
-        while(std::getline(faceSs, indexString, '/') && i < 3) {
-            if(!indexString.empty()) {
-                indices[i] = std::stoi(indexString);
-            }
-            i++;
-        }
-//        for(const int& index: indices) {
-//            std::cout << "Indices on:" << index << "\n";
-//        }
-//
-        if(indices[0] > 0) {
-            face.vertexIndices.push_back(indices[0]--);
-        }
-        if(indices[1] > 0) {
-            face.texCoordIndices.push_back(indices[1]--);
-        }
-        if(indices[2] > 0) {
-            face.normalIndices.push_back(indices[2]--);
-        }
-
-        std::cout << "-------------FACE DATA-------------" << "\n";
-        for(size_t j = 0; j < face.vertexIndices.size(); j++) {
-            const auto& pos = isblank(face.vertexIndices[j]) ? -1 : face.vertexIndices[j];
-            const auto& tex = isblank(face.texCoordIndices[j]) ? -1 : face.texCoordIndices[j];
-            const auto& normal = isblank(face.normalIndices[j]) ? -1 : face.normalIndices[j];
-            std::cout << "Face vertex: " << pos << "\n";
-            std::cout << "Face texture: " << tex << "\n";
-            std::cout << "Face normal: " << normal << "\n";
-        }
+std::vector<std::string> Split(std::string str, const std::string &separator) {
+    std::vector<std::string> ret;
+    size_t index;
+    while (true) {
+        index = str.find(separator);
+        if (index == std::string::npos)
+            break;
+        ret.push_back(str.substr(0, index));
+        str = str.substr(index + 1);
     }
-//    this->faces.push_back(face);
+    ret.push_back(str);
+    return ret;
+}
+
+void ObjectLoader::parseFace(std::istringstream &stringStream) {
+    std::string faceData{};
+    std::vector<std::string> params{};
+
+    while (stringStream >> faceData) {
+        params.push_back(faceData);
+    }
+
+//    for(const auto& data: params) {
+//        std::cout << data << "\t";
+//    }
+//    std::cout << std::endl;
+
+    for (size_t ii = 3; ii <= params.size(); ii++) {
+        Face face;
+        for (size_t i = ii - 3; i < ii; i++) {
+            std::vector<std::string> indices = Split(params[i == (ii - 3) ? 0 : i], "/");
+            if (!indices.empty())
+                face.vertexIndices.push_back(std::stoi(indices[0]) - 1);
+            if (indices.size() == 2)
+                face.texCoordIndices.push_back(std::stoi(indices[1]) - 1);
+            if (indices.size() == 3) {
+                if (!indices[1].empty())
+                    face.texCoordIndices.push_back(std::stoi(indices[1]) - 1);
+                face.normalIndices.push_back(std::stoi(indices[2]) - 1);
+            }
+        }
+        this->faces.push_back(face);
+    }
+
+//    for(const auto& data : params) {
+//        std::cout << "Face data: " <<  data << "\n";
+//    }
+
 }
 
 
@@ -184,10 +186,6 @@ std::shared_ptr<tigl::VBO> ObjectLoader::createVBO() {
     }
     std::shared_ptr<tigl::VBO> modelVBO;
     modelVBO.reset(tigl::createVbo(vbo_vertices));
-    if (modelVBO == nullptr) {
-        std::cerr << "YOOO NO MODEL FOR YOU!" << std::endl;
-        return nullptr;
-    }
 
     vbo_vertices.clear();
     return modelVBO;

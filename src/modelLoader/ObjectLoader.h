@@ -19,6 +19,13 @@ struct Face {
     int smoothingGroup;
 };
 
+struct IndexedVertex {
+    int vertexIndex;
+    int texIndex;
+    int normalIndex;
+//    std::string materialName{};
+//    int smoothingGroup;
+};
 class ObjectLoader {
 public:
     ObjectLoader() = default;

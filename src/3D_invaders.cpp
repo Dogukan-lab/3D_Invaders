@@ -294,7 +294,6 @@ void draw() {
     tigl::shader->enableLighting(false);
     //Draw faces from obj loader
     tigl::drawVertices(GL_TRIANGLES, worldPlane.get());
-
     tigl::drawVertices(GL_TRIANGLES, vbo.get());
 
 
