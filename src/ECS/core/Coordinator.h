@@ -25,11 +25,12 @@ public:
 	* Adds entity to all managers, for now uses a standard entity component preset.
 	*/
 	types::EntityID& createEntity() {
-		auto entity = this->entityManager->createEntity().lock();
+		const auto& entity = this->entityManager->createEntity();
+        std::cout << "ENTITY CREATED WITH COORDINATOR: " << entity->entityID << std::endl;
 		return entity->entityID;
 	}
 
-	std::weak_ptr<Entity> getEntity(const size_t& entityID) {
+	std::shared_ptr<Entity> getEntity(const size_t& entityID) {
 		return this->entityManager->getEntity(entityID);
 	}
 
@@ -43,8 +44,8 @@ public:
 	}
 
 	template<typename T>
-	std::weak_ptr<T> addComponent(const size_t& entityID) {
-		auto entity = this->entityManager->getEntity(entityID).lock();
+	std::shared_ptr<T> addComponent(const size_t& entityID) {
+		const auto& entity = this->entityManager->getEntity(entityID);
 		entity->addComponent<T>();
 		this->systemManager->entitySignatureChanged(entity);
 		return entity->getComponent<T>();
@@ -52,20 +53,20 @@ public:
 
 	template<typename T>
 	void removeComponent(const types::EntityID& entityID) {
-        if(this->entityManager->getEntity(entityID).expired())
+        if(this->entityManager->getEntity(entityID) == nullptr)
             std::cerr << "Specified entity is no longer accessible" << std::endl;
-		auto entity = this->entityManager->getEntity(entityID).lock();
+		const auto& entity = this->entityManager->getEntity(entityID);
 		entity->deleteComponent<T>();
 		this->systemManager->entitySignatureChanged(entity);
 	}
 
 	template<typename T>
-	std::weak_ptr<T> registerSystem() {
+	std::shared_ptr<T> registerSystem() {
 		return this->systemManager->registerSystem<T>();
 	}
 	
 	template<typename T>
-	std::weak_ptr<T> getSystem() {
+	std::shared_ptr<T> getSystem() {
 		return this->systemManager->getSystem<T>();
 	}
 

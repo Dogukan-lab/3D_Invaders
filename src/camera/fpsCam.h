@@ -16,9 +16,16 @@ public:
         this->position = newPos;
     }
 
+    inline glm::vec3& getPos() {
+        return position;
+    }
+    inline glm::vec3& getRotation() {
+        return rotation;
+    }
+
 private:
     glm::vec3 position = glm::vec3(0.f);
-    glm::vec2 rotation = glm::vec2(0.f);
+    glm::vec3 rotation = glm::vec3(0.f);
     void move(float angle, float vac);
 
     GLFWwindow* currentWindow;

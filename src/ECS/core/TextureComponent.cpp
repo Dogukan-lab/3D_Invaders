@@ -3,28 +3,42 @@
 #include "../../stb_image.h"
 #include "glad/gl.h"
 
-void TextureComponent::loadTexture(const char* texturePath)
+void TextureComponent::loadTexture(const std::string& texturePath)
 {
-    unsigned char* imageData;
-    int texWidth, texHeight, bpp;
-    imageData = stbi_load(texturePath, &texWidth, &texHeight, &bpp, 4);
+    texPath = texturePath;
+    stbi_set_flip_vertically_on_load(1);
+    int width, height, BPP;
+    std::cout << "TEX PATH: " << texturePath << std::endl;
+    unsigned char* buffer = stbi_load(texturePath.c_str(), &width, &height, &BPP, 4);
+    if (buffer == nullptr)
+    {
+        std::cout << stbi_failure_reason() << std::endl;
+    }
+
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D,
-        0,
-        GL_RGBA,
-        texWidth,
-        texHeight,
-        0,
-        GL_RGBA,
-        GL_UNSIGNED_BYTE,
-        imageData);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    stbi_image_free(imageData);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // S and T are like X and Y for textures.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    if (buffer) {
+        stbi_image_free(buffer);
+    }
 }
 
 void TextureComponent::bindTexture() const
 {
+//    std::cout << "TEX PATH BIND " << texPath << std::endl;
     glBindTexture(GL_TEXTURE_2D, this->textureID);
+}
+void TextureComponent::unbindTexture() const {
+    glBindTexture(GL_TEXTURE_2D, 0);
 }

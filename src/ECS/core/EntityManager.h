@@ -16,7 +16,7 @@ public:
 	* TODO make overloaded function that functions with a template instead, 
 	* only needed when entities become dynamic for e.g. player, worldObject and so on.
 	*/
-	std::weak_ptr<Entity> createEntity() {
+	std::shared_ptr<Entity> createEntity() {
 		auto ptr = std::make_shared<Entity>();
 		this->entities[ptr->entityID] = ptr;
 
@@ -31,7 +31,7 @@ public:
 	}
 
     //TODO Make this return a weakptr as a reference to the entity.
-	std::weak_ptr<Entity> getEntity(const types::EntityID& entityID) {
+	std::shared_ptr<Entity> getEntity(const types::EntityID& entityID) {
 		return this->entities[entityID];
 	}
 

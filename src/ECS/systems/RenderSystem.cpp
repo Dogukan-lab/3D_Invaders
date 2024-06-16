@@ -21,34 +21,17 @@ RenderSystem::RenderSystem()
 */
 void RenderSystem::draw()
 {
-	tigl::shader->enableLighting(true);
-	tigl::shader->enableColor(true);
-	tigl::shader->setShinyness(20.f);
-	tigl::shader->setLightCount(2);
-	tigl::shader->setLightDirectional(0, false);
-	tigl::shader->setLightPosition(0, { 0, 5, 10 });
-	tigl::shader->setLightAmbient(0, { .15f, .05f, .1f });
-	tigl::shader->setLightDiffuse(0, { .9f, .9f, .9f });
-	tigl::shader->setLightSpecular(0, { 0.4f, 0.6f, 0.1f });
-
-	tigl::shader->setLightDirectional(1, false);
-	tigl::shader->setLightPosition(1, { -10, 5, -10 });
-	tigl::shader->setLightAmbient(1, { .15f, .05f, .1f });
-	tigl::shader->setLightDiffuse(1, { .9f, .9f, .9f });
-	tigl::shader->setLightSpecular(1, { 0.4f, 0.6f, 0.1f });
-
-
+    tigl::shader->use();
 	tigl::shader->enableFog(true);
 	tigl::shader->setFogColor({ 0.3f, 0.4f, 0.6f });
 	tigl::shader->setFogExp2(.25f);
-	//tigl::shader->enableTexture(true);
 
 	//TODO Lighcomponent so you can move it around.
 	for (const auto& entity : this->entities) {
-		auto transform = entity->getComponent<Transform>().lock();
-		glm::mat4 modelM = glm::mat4(1.f);
-        auto texture = entity->getComponent<TextureComponent>().lock();
-        auto light = entity->getComponent<LightComponent>().lock();
+        glm::mat4 modelM = glm::mat4(1.f);
+		auto transform = entity->getComponent<Transform>();
+        auto texture = entity->getComponent<TextureComponent>();
+        auto light = entity->getComponent<LightComponent>();
 		if (texture) {
 			//std::cout << "Entity ID: " << entity->entityID << "Has TEXTURE!" << std::endl;
 			tigl::shader->enableTexture(true);
@@ -57,14 +40,13 @@ void RenderSystem::draw()
         if(light) {
             tigl::shader->setLightPosition(0, light->position);
         }
-
-		modelM = glm::translate(modelM, transform->position);
-		modelM = glm::rotate(modelM, transform->rotation.x, glm::vec3(1, 0, 0));
-		modelM = glm::rotate(modelM, transform->rotation.y, glm::vec3(0, 1, 0));
+        modelM = glm::translate(modelM, transform->position);
 		modelM = glm::rotate(modelM, transform->rotation.z, glm::vec3(0, 0, 1));
+		modelM = glm::rotate(modelM, transform->rotation.y, glm::vec3(0, 1, 0));
+		modelM = glm::rotate(modelM, transform->rotation.x, glm::vec3(1, 0, 0));
 		modelM = glm::scale(modelM, transform->scale);
 		tigl::shader->setModelMatrix(modelM);
-		tigl::drawVertices(GL_TRIANGLES, entity->getComponent<Mesh>().lock()->drawable.get());
+		tigl::drawVertices(GL_TRIANGLES, entity->getComponent<Mesh>()->drawable.get());
 		tigl::shader->enableTexture(false);
 	}
 }

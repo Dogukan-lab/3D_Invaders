@@ -9,6 +9,7 @@
 #include <iostream>
 #include <bitset>
 
+const std::string mtlPath("C:/githubrepos/3D_Invaders/resources/spaceship/");
 std::string currentMaterial;
 int currentSmoothingGroup = 0;
 
@@ -75,10 +76,9 @@ void ObjectLoader::parseNormal(std::istringstream &stringStream) {
 }
 
 void ObjectLoader::parseMaterial(const std::string &fileName) {
-    std::ifstream materialFile("../resources/spaceship/" + fileName);
+    std::ifstream materialFile(mtlPath + fileName);
     if (!materialFile.is_open())
         std::cerr << "File could not be opened!" << std::endl;
-
     std::string line;
     Material material;
     while (std::getline(materialFile, line)) {
@@ -104,7 +104,11 @@ void ObjectLoader::parseMaterial(const std::string &fileName) {
         } else if (type == "illum") {
             stringStream >> material.illumination;
         } else if (type == "map_Kd") {
-            stringStream >> material.map_Kd;
+            std::string tempString;
+            stringStream >> tempString;
+            material.map_Kd = mtlPath + tempString;
+//            std::cout << "MAP KD: " << material.map_Kd << "\n";
+             
         }
     }
 
@@ -189,4 +193,17 @@ std::shared_ptr<tigl::VBO> ObjectLoader::createVBO() {
 
     vbo_vertices.clear();
     return modelVBO;
+}
+
+void ObjectLoader::printMaterials() {
+    std::ostringstream stringStream;
+    for(const auto& matPair: materials) {
+        auto& mat = matPair.second;
+        stringStream << mat;
+        std::cout << stringStream.str() << "\n";
+    }
+}
+
+Material& ObjectLoader::getMaterial(const std::string& mat) {
+    return materials[mat];
 }

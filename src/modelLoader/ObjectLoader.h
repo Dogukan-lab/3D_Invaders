@@ -34,6 +34,10 @@ public:
     void parseMaterial(const std::string& fileName);
     std::shared_ptr<tigl::VBO> createVBO();
 
+    void printMaterials();
+
+    Material& getMaterial(const std::string& mat);
+
 private:
     //Data
     std::vector<glm::vec3> vertices{};

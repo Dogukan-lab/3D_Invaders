@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <../imgui/include/imgui_impl_opengl3.h>
 #include <iostream>
+#include <sstream>
 #include "glm/gtx/string_cast.hpp"
 #include "tigl.h"
 #include "camera/fpsCam.h"
@@ -20,11 +21,11 @@
 #define OBJLOADER 0
 
 //TODO Refactor these raw pointers!
-GLFWwindow* glfwWindow;
+GLFWwindow *glfwWindow;
 std::unique_ptr<Window> controlPanel = std::make_unique<Window>();
 std::unique_ptr<FPSCam> fpscam;
 std::shared_ptr<Coordinator> ecsCoordinator;
-std::unique_ptr<ModelLoader> modelLoader;
+std::unique_ptr<ObjectLoader> objLoader;
 
 std::shared_ptr<tigl::VBO> vbo;
 std::shared_ptr<tigl::VBO> worldPlane;
@@ -37,13 +38,14 @@ int windowWidth = 1280, windowHeight = 1080;
 constexpr float tileSize = 32.f;
 
 void init();
-void testObjLoader();
+
 void update();
+
 void draw();
+
 void decompose();
 
-int main()
-{
+int main() {
 #if TESTING
     return UnitTester::startTests();
 #endif
@@ -58,28 +60,24 @@ int main()
 
     /* Create a windowed mode window and its OpenGL context */
     glfwWindow = glfwCreateWindow(windowWidth, windowHeight, "Why are you reading this", nullptr, nullptr);
-    if (!glfwWindow)
-
-    {
+    if (!glfwWindow) {
         glfwTerminate();
         return -1;
     }
 
     /* Make the window's context current */
     glfwMakeContextCurrent(glfwWindow);
-    if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
+    if (!gladLoadGL((GLADloadfunc) glfwGetProcAddress)) {
         std::cout << "Failed to initialize glad interface!" << std::endl;
         return -1;
     }
 
     tigl::init();
-    testObjLoader();
-//    init();
+    init();
     glfwSwapInterval(1);
 
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(glfwWindow))
-    {
+    while (!glfwWindowShouldClose(glfwWindow)) {
         /* Render here */
         update();
         draw();
@@ -101,41 +99,79 @@ void decompose() {
     glfwTerminate();
 }
 
-void testObjLoader() {
-    glfwSetKeyCallback(glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-        if (key == GLFW_KEY_ESCAPE)
-            glfwSetWindowShouldClose(window, 1);
-    });
-    std::vector<tigl::Vertex> triangleVertices {
-            tigl::Vertex::PT({ -.5f, -.5f, .5f }, glm::vec2(0 * tileSize, 0*tileSize)),
-            tigl::Vertex::PT({ -.5f, -.5f, -.5f }, glm::vec2(0*tileSize, 0*tileSize)),
-            tigl::Vertex::PT({ .5f, -.5f, .5f}, glm::vec2(1*tileSize, 0*tileSize)),
+void setupTerrain() {
+    //Set world plane
+    std::vector<tigl::Vertex> triangleVertices{
+            tigl::Vertex::PT({-.5f, -.5f, .5f}, glm::vec2(0 * tileSize, 0 * tileSize)),
+            tigl::Vertex::PT({-.5f, -.5f, -.5f}, glm::vec2(0 * tileSize, 0 * tileSize)),
+            tigl::Vertex::PT({.5f, -.5f, .5f}, glm::vec2(1 * tileSize, 0 * tileSize)),
 
-            tigl::Vertex::PT({ .5f, -.5f, .5f }, glm::vec2(1*tileSize, 0*tileSize)),
-            tigl::Vertex::PT({ .5f, -.5f, -.5f }, glm::vec2(1*tileSize, 0*tileSize)),
-            tigl::Vertex::PT({ -.5f, -.5f, -.5f }, glm::vec2(0*tileSize, 0*tileSize)),
+            tigl::Vertex::PT({.5f, -.5f, .5f}, glm::vec2(1 * tileSize, 0 * tileSize)),
+            tigl::Vertex::PT({.5f, -.5f, -.5f}, glm::vec2(1 * tileSize, 0 * tileSize)),
+            tigl::Vertex::PT({-.5f, -.5f, -.5f}, glm::vec2(0 * tileSize, 0 * tileSize)),
     };
 
     worldPlane.reset(tigl::createVbo(triangleVertices));
-
-    fpscam = std::make_unique<FPSCam>(glfwWindow);
-    fpscam->setPosition({ 0, 0, -5 });
-    ObjectLoader loader("../resources/spaceship/lowpoly_spaceship.obj");
-//    loader.parseMaterial("lowpoly_spaceship.mtl");
-    vbo = loader.createVBO();
+    const auto &entity = ecsCoordinator->createEntity();
+    ecsCoordinator->addComponent<Mesh>(entity)->drawable = worldPlane;
+    ecsCoordinator->addComponent<Transform>(entity)->position = {0, 0, 0};
 }
 
-void printEntity(const std::weak_ptr<Entity>& entity) {
+void setupShip(const std::shared_ptr<tigl::VBO> &vbo) {
+    const auto &shipEntity = ecsCoordinator->createEntity();
+
+    //Setup ship stuff
+
+    const auto &transform = ecsCoordinator->addComponent<Transform>(shipEntity);
+    transform->scale = glm::vec3(0.1f);
+    transform->rotation = fpscam->getRotation();
+    const auto &mesh = ecsCoordinator->addComponent<Mesh>(shipEntity);
+    mesh->drawable = vbo;
+    ecsCoordinator->addComponent<LightComponent>(shipEntity)->position = fpscam->getPos();
+}
+
+void init() {
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glfwSetKeyCallback(glfwWindow, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
+        if (key == GLFW_KEY_ESCAPE)
+            glfwSetWindowShouldClose(window, 1);
+    });
+//Shader settings
+    tigl::shader->enableLighting(true);
+    tigl::shader->setLightCount(1);
+    tigl::shader->setShinyness(10.f);
+
+    //Camera Light
+    tigl::shader->setLightDirectional(0, false);
+    tigl::shader->setLightAmbient(0, glm::vec3(0.25f, 0.25f, 0.25f));
+    tigl::shader->setLightDiffuse(0, glm::vec3(0.9f, 0.9f, 0.9f));
+
+    controlPanel->Init(glfwWindow);
+    ecsCoordinator = std::make_unique<Coordinator>();
+    ecsCoordinator->registerSystem<RenderSystem>();
+    fpscam = std::make_unique<FPSCam>(glfwWindow);
+    objLoader = std::make_unique<ObjectLoader>("../resources/spaceship/lowpoly_spaceship.obj");
+    setupTerrain();
+    vbo = objLoader->createVBO();
+    setupShip(vbo);
+
+}
+
+
+void printEntity(const std::weak_ptr<Entity> &entity) {
     if (entity.expired())
         return;
     std::cout << "Entity ID: " << entity.lock()->entityID << std::endl;
 
-   /* auto transform = entity->getComponent<Transform>();
-    if (!transform)
-        return;*/
+    /* auto transform = entity->getComponent<Transform>();
+     if (!transform)
+         return;*/
 
     std::cout << "Entity Signature: " << entity.lock()->getSig().to_string() << std::endl;
-    
+
     //Transform debug code
 //    std::cout << "Transform Position: " << glm::to_string(transform->position) << std::endl;
 //    std::cout << "Transform Rotation: " << glm::to_string(transform->rotation) << std::endl;
@@ -151,105 +187,10 @@ void stressTest(std::shared_ptr<tigl::VBO> vbo) {
         auto entity = ecsCoordinator->createEntity();
     }
 
-    ecsCoordinator->getEntity(2).lock()->addComponent<Mesh>().lock()->setMesh(vbo);
+    ecsCoordinator->getEntity(2)->addComponent<Mesh>()->setMesh(vbo);
     printEntity(ecsCoordinator->getEntity(2));
 }
 
-
-void init() {
-    controlPanel->Init(glfwWindow);
-    glfwSetKeyCallback(glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-        if (key == GLFW_KEY_ESCAPE)
-            glfwSetWindowShouldClose(window, 1);
-        });
-
-    fpscam = std::make_unique<FPSCam>(glfwWindow);
-    fpscam->setPosition({ 0, 0, -5 });
-    modelLoader = std::make_unique<ModelLoader>(); //Dit wordt niet opgeschoond, dus maak unique_ptrs of anders gewoon smart pointers.
-    ecsCoordinator = std::make_unique<Coordinator>();
-
-    std::vector<tigl::Vertex> quadVertices = {  
-        //Face of cube GREEN
-        tigl::Vertex::PCTN(glm::vec3(-.5f, .5f, -.5f), glm::vec4(0.f, .5f, .0f, 1.f), glm::vec2(0), glm::vec3(0, 0, 1)),
-        tigl::Vertex::PCTN(glm::vec3(-.5f, -.5f, -.5f), glm::vec4(0.f, .5f, .0f, 1.f), glm::vec2(0), glm::vec3(0, 0, 1)),
-        tigl::Vertex::PCTN(glm::vec3(.5f, -.5f, -.5f), glm::vec4(0.f, .5f, .0f, 1.f), glm::vec2(0), glm::vec3(0, 0, 1)),
-        tigl::Vertex::PCTN(glm::vec3(.5f, .5f, -.5f), glm::vec4(0.f, .5f, .0f, 1.f), glm::vec2(0), glm::vec3(0, 0, 1)),
-        
-        //Left side Cube RED
-        tigl::Vertex::PCTN(glm::vec3(-.5f, .5f, -.5f), glm::vec4(.5f, .0f, .0f, 1.f), glm::vec2(0), glm::vec3(-1, 0, 0)),
-        tigl::Vertex::PCTN(glm::vec3(-.5f, -.5f, -.5f), glm::vec4(.5f, .0f, .0f, 1.f), glm::vec2(0), glm::vec3(-1, 0, 0)),
-        tigl::Vertex::PCTN(glm::vec3(-.5f, -.5f, .5f), glm::vec4(.5f, .0f, .0f, 1.f), glm::vec2(0), glm::vec3(-1, 0, 0)),
-        tigl::Vertex::PCTN(glm::vec3(-.5f, .5f, .5f), glm::vec4(.5f, .0f, .0f, 1.f), glm::vec2(0), glm::vec3(-1, 0, 0)),
-
-        //Back of cube BLUE
-        tigl::Vertex::PCTN(glm::vec3(-.5f, .5f, .5f), glm::vec4(0.f, 0.f, .5f, 1.f), glm::vec2(0), glm::vec3(0, 0, -1)),
-        tigl::Vertex::PCTN(glm::vec3(-.5f, -.5f, .5f), glm::vec4(0.f, 0.f, .5f, 1.f), glm::vec2(0), glm::vec3(0, 0, -1)),
-        tigl::Vertex::PCTN(glm::vec3(.5f, -.5f, .5f), glm::vec4(0.f, 0.f, .5f, 1.f), glm::vec2(0), glm::vec3(0, 0, -1)),
-        tigl::Vertex::PCTN(glm::vec3(.5f, .5f, .5f), glm::vec4(0.f, 0.f, .5f, 1.f), glm::vec2(0), glm::vec3(0, 0, -1)),
-
-        //Right side of cube SOMETHING
-        tigl::Vertex::PCTN(glm::vec3(.5f, .5f, -.5f), glm::vec4(0.7f, 0.5f, .1f, 1.f), glm::vec2(0), glm::vec3(1, 0, 0)),
-        tigl::Vertex::PCTN(glm::vec3(.5f, -.5f, -.5f), glm::vec4(0.7f, 0.5f, .1f, 1.f), glm::vec2(0), glm::vec3(1, 0, 0)),
-        tigl::Vertex::PCTN(glm::vec3(.5f, -.5f, .5f), glm::vec4(0.7f, 0.5f, .1f, 1.f), glm::vec2(0), glm::vec3(1, 0, 0)),
-        tigl::Vertex::PCTN(glm::vec3(.5f, .5f, .5f), glm::vec4(0.7f, 0.5f, .1f, 1.f), glm::vec2(0), glm::vec3(1, 0, 0)),
-
-        //Top of cube
-        tigl::Vertex::PCTN(glm::vec3(-.5f, .5f, -.5f), glm::vec4(0.f, 0.f, 0.f, 1.f), glm::vec2(0), glm::vec3(0, 1, 0)),
-        tigl::Vertex::PCTN(glm::vec3(-.5f, .5f, .5f), glm::vec4(0.f, 0.f, 0.f, 1.f), glm::vec2(0), glm::vec3(0, 1, 0)),
-        tigl::Vertex::PCTN(glm::vec3(.5f, .5f, .5f), glm::vec4(0.f, 0.f, 0.f, 1.f), glm::vec2(0), glm::vec3(0, 1, 0)),
-        tigl::Vertex::PCTN(glm::vec3(.5f, .5f, -.5f), glm::vec4(0.f, 0.f, 0.f, 1.f), glm::vec2(0), glm::vec3(0, 1, 0)),
-
-        //Bottom of cube
-        tigl::Vertex::PCTN(glm::vec3(-.5f, -.5f, -.5f), glm::vec4(1.f, 1.f, 1.f, 1.f), glm::vec2(0), glm::vec3(0, -1, 0)),
-        tigl::Vertex::PCTN(glm::vec3(-.5f, -.5f, .5f), glm::vec4(1.f, 1.f, 1.f, 1.f), glm::vec2(0), glm::vec3(0, -1, 0)),
-        tigl::Vertex::PCTN(glm::vec3(.5f, -.5f, .5f), glm::vec4(1.f, 1.f, 1.f, 1.f), glm::vec2(0), glm::vec3(0, -1, 0)),
-        tigl::Vertex::PCTN(glm::vec3(.5f, -.5f, -.5f), glm::vec4(1.f, 1.f, 1.f, 1.f), glm::vec2(0), glm::vec3(0, -1, 0)),
-    };
-
-    //TODO WORLDPLANE GRASS TEXTURE OR SOMETHING IDK
-    std::vector<tigl::Vertex> triangleVertices {
-        tigl::Vertex::PT({ -.5f, -.5f, .5f }, glm::vec2(0 * tileSize, 0*tileSize)),
-            tigl::Vertex::PT({ -.5f, -.5f, -.5f }, glm::vec2(0*tileSize, 0*tileSize)),
-            tigl::Vertex::PT({ .5f, -.5f, .5f}, glm::vec2(1*tileSize, 0*tileSize)),
-            
-            tigl::Vertex::PT({ .5f, -.5f, .5f }, glm::vec2(1*tileSize, 0*tileSize)),
-            tigl::Vertex::PT({ .5f, -.5f, -.5f }, glm::vec2(1*tileSize, 0*tileSize)),
-            tigl::Vertex::PT({ -.5f, -.5f, -.5f }, glm::vec2(0*tileSize, 0*tileSize)),
-    };
-
-    std::shared_ptr<tigl::VBO> worldPlane;
-    worldPlane.reset(tigl::createVbo(triangleVertices));
-
-    //stressTest(cubeVBO);
-    //TODO When demo happens make sure to change absolute path to relative!
-    modelLoader->loadModel(R"(../resources/models/suzanne.obj)");
-    ecsCoordinator->registerSystem<RenderSystem>();
-    auto entity = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity).lock()->drawable = modelLoader->createVBO(); //Deze lijkt redundant als ik toch al entity backref xD
-    ecsCoordinator->addComponent<Transform>(entity); //Deze lijkt redundant als ik toch al entity backref xD
-    
-    auto entity2 = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity2).lock()->drawable = modelLoader->createVBO();
-    ecsCoordinator->addComponent<Transform>(entity2).lock()->position = {-5, 2, 3};
-
-    modelLoader->loadModel(R"(../resources/models/chr_knight.obj)");
-    auto entity3 = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity3).lock()->drawable = modelLoader->createVBO();
-    ecsCoordinator->addComponent<Transform>(entity3).lock()->position = { 5, -1, 4 };
-
-    auto entity4 = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity4).lock()->drawable = worldPlane;
-    if(auto transform4 = ecsCoordinator->addComponent<Transform>(entity4).lock()) {
-        transform4->position = { 0, 6, 0 };
-        transform4->scale = { 15, 15, 15 };
-    }
-
-    if(auto tex4 = ecsCoordinator->addComponent<TextureComponent>(entity4).lock())
-        tex4->loadTexture(R"(../resources/textures/Brick_wall.png)");
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_TEXTURE);
-}
 
 double lastTime = 0.0;
 bool frameIsStatic = false;
@@ -265,42 +206,33 @@ void update() {
     }
 
     fpscam->update_cam(deltaTime, frameIsStatic);
-//    controlPanel->Update(ecsCoordinator, glfwWindow);
+    controlPanel->Update(ecsCoordinator, glfwWindow);
 
-
-    //ecsCoordinator->getEntity(0)->getComponent<Transform>()->position.x += (1 * deltaTime);
-//    ecsCoordinator->getEntity(0).lock()->getComponent<Transform>().lock()->rotation.y += (1 * deltaTime);
-//    ecsCoordinator->getEntity(1).lock()->getComponent<Transform>().lock()->rotation.x += (1 * deltaTime);
-//    ecsCoordinator->getEntity(2).lock()->getComponent<Transform>().lock()->rotation.z += (1 * deltaTime);
+    const auto &ship = ecsCoordinator->getEntity(1);
+    const auto &transform = ship->getComponent<Transform>();
+    const auto &light = ship->getComponent<LightComponent>();
+    glm::vec3 point = glm::vec3(0, -1, -1);
+    glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.f), fpscam->getRotation().y, glm::vec3(0, 1, 0));
+    light->position = -fpscam->getPos();
+    transform->rotation = (-fpscam->getRotation() + glm::vec3(0, glm::radians(180.f), 0)) * glm::vec3(0,1,0);
+    transform->position = -fpscam->getPos() + glm::vec3(glm::vec4(point, 1.f) * rotationMatrix);
 }
 
 void draw() {
-    glViewport(0, 0, windowWidth, windowHeight); 
+    glViewport(0, 0, windowWidth, windowHeight);
     glGetIntegerv(GL_VIEWPORT, viewport);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
 
     //Camera setup before drawing.
     tigl::shader->setProjectionMatrix(
-        glm::perspective(glm::radians(75.0f), viewport[2] / (float)viewport[3], 0.01f, 100.f)
+            glm::perspective(glm::radians(75.0f), viewport[2] / (float) viewport[3], 0.01f, 100.f)
     );
     tigl::shader->setViewMatrix(fpscam->getMatrix());
     tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
-    //Set light
-//    tigl::shader->setLightDirectional(0, false);
-    //Set diffuse and so on.
-//    tigl::shader->setLightDiffuse(0, glm::vec3(0));
-    tigl::shader->enableLighting(false);
-    //Draw faces from obj loader
-    tigl::drawVertices(GL_TRIANGLES, worldPlane.get());
-    tigl::drawVertices(GL_TRIANGLES, vbo.get());
-
-
-    //tigl::shader->enableColor(true);
-
-//    ImGui::Render();
-//    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-//    ecsCoordinator->getSystem<RenderSystem>().lock()->draw();
-//    controlPanel->Render();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ecsCoordinator->getSystem<RenderSystem>()->draw();
+    controlPanel->Render();
 }
