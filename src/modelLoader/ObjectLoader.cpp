@@ -11,11 +11,13 @@
 
 const std::string mtlPath("C:/githubrepos/3D_Invaders/resources/spaceship/");
 std::string currentMaterial;
+std::string currentObj;
 int currentSmoothingGroup = 0;
 
-ObjectLoader::ObjectLoader(const char *filePath) {
+void ObjectLoader::loadObject(const char *filePath, const char* objectName) {
     //Parse object in this
-
+    currentObj = objectName;
+    models[currentObj] = nullptr;
     std::ifstream file(filePath);
     if (!file.is_open())
         std::cerr << "Couldn't open or find file!" << std::endl;
@@ -54,6 +56,8 @@ ObjectLoader::ObjectLoader(const char *filePath) {
             //Do nothing for first rendition of object loader.
         }
     }
+    createVBO();
+    currentObj.clear();
     file.close();
 }
 
@@ -177,22 +181,22 @@ void ObjectLoader::parseFace(std::istringstream &stringStream) {
 }
 
 
-std::shared_ptr<tigl::VBO> ObjectLoader::createVBO() {
-//    Mesh -> material
-//    Mesh -> drawable (VBO)
+void ObjectLoader::createVBO() {
+
     std::vector<tigl::Vertex> vbo_vertices;
     for (const auto &face: this->faces) {
         for (int i = 0; i < 3; i++) {
             auto &position = this->vertices[face.vertexIndices[i]];
             auto &normal = this->normals[face.normalIndices[i]];
-            vbo_vertices.push_back(tigl::Vertex::PCN(position, glm::vec4(1.f), normal));
+            auto &texture = this->texCoords[face.texCoordIndices[i]];
+            vbo_vertices.push_back(tigl::Vertex::PCTN(position, glm::vec4(1.f), texture, normal));
         }
     }
+
     std::shared_ptr<tigl::VBO> modelVBO;
     modelVBO.reset(tigl::createVbo(vbo_vertices));
-
+    models[currentObj] = modelVBO;
     vbo_vertices.clear();
-    return modelVBO;
 }
 
 void ObjectLoader::printMaterials() {
@@ -207,3 +211,4 @@ void ObjectLoader::printMaterials() {
 Material& ObjectLoader::getMaterial(const std::string& mat) {
     return materials[mat];
 }
+

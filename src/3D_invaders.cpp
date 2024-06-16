@@ -112,22 +112,39 @@ void setupTerrain() {
     };
 
     worldPlane.reset(tigl::createVbo(triangleVertices));
-    const auto &entity = ecsCoordinator->createEntity();
-    ecsCoordinator->addComponent<Mesh>(entity)->drawable = worldPlane;
-    ecsCoordinator->addComponent<Transform>(entity)->position = {0, 0, 0};
+    const auto &planeEntity = ecsCoordinator->createEntity();
+    const auto& planeMesh = ecsCoordinator->addComponent<Mesh>(planeEntity);
+    planeMesh->drawable = worldPlane;
+    planeMesh->colour = glm::vec3(1.f);
+    ecsCoordinator->addComponent<Transform>(planeEntity)->position = {0, 0, 0};
+
+    //Sun
+    const auto& sunEntity = ecsCoordinator->createEntity();
+    const auto& sunTransform = ecsCoordinator->addComponent<Transform>(sunEntity);
+    const auto& sunMesh = ecsCoordinator->addComponent<Mesh>(sunEntity);
+    const auto& sunTexture = ecsCoordinator->addComponent<TextureComponent>(sunEntity);
+    const auto& sunLight = ecsCoordinator->addComponent<LightComponent>(sunEntity);
+
+    sunTransform->position = glm::vec3(0, 0.5f, -4.f);
+    sunTransform->scale = glm::vec3(0.7f);
+    sunMesh->drawable = objLoader->getVBO("sun").lock();
+    sunTexture->loadTexture(objLoader->getMaterial("moon").map_Kd);
+    sunLight->position = sunTransform->position;
 }
 
-void setupShip(const std::shared_ptr<tigl::VBO> &vbo) {
+void setupShip(const std::weak_ptr<tigl::VBO> &vbo) {
     const auto &shipEntity = ecsCoordinator->createEntity();
 
     //Setup ship stuff
-
     const auto &transform = ecsCoordinator->addComponent<Transform>(shipEntity);
     transform->scale = glm::vec3(0.1f);
     transform->rotation = fpscam->getRotation();
     const auto &mesh = ecsCoordinator->addComponent<Mesh>(shipEntity);
-    mesh->drawable = vbo;
-    ecsCoordinator->addComponent<LightComponent>(shipEntity)->position = fpscam->getPos();
+    mesh->drawable = vbo.lock();
+//    mesh->colour = glm::vec3(0, 0, 1.f);
+//    ecsCoordinator->addComponent<LightComponent>(shipEntity)->position = fpscam->getPos();
+    const auto& textureComp = ecsCoordinator->addComponent<TextureComponent>(shipEntity);
+    textureComp->loadTexture(objLoader->getMaterial("Material.001").map_Kd);
 }
 
 void init() {
@@ -153,11 +170,11 @@ void init() {
     ecsCoordinator = std::make_unique<Coordinator>();
     ecsCoordinator->registerSystem<RenderSystem>();
     fpscam = std::make_unique<FPSCam>(glfwWindow);
-    objLoader = std::make_unique<ObjectLoader>("../resources/spaceship/lowpoly_spaceship.obj");
+    objLoader = std::make_unique<ObjectLoader>();
+    objLoader->loadObject("../resources/spaceship/lowpoly_spaceship.obj", "ship");
+    objLoader->loadObject("../resources/spaceship/sun.obj", "sun");
     setupTerrain();
-    vbo = objLoader->createVBO();
-    setupShip(vbo);
-
+    setupShip(objLoader->getVBO("ship"));
 }
 
 
@@ -208,12 +225,11 @@ void update() {
     fpscam->update_cam(deltaTime, frameIsStatic);
     controlPanel->Update(ecsCoordinator, glfwWindow);
 
-    const auto &ship = ecsCoordinator->getEntity(1);
+    //Ship movement.
+    const auto &ship = ecsCoordinator->getEntity(2);
     const auto &transform = ship->getComponent<Transform>();
-    const auto &light = ship->getComponent<LightComponent>();
-    glm::vec3 point = glm::vec3(0, -1, -1);
+    glm::vec3 point = glm::vec3(0, -0.25f, -0.6f);
     glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.f), fpscam->getRotation().y, glm::vec3(0, 1, 0));
-    light->position = -fpscam->getPos();
     transform->rotation = (-fpscam->getRotation() + glm::vec3(0, glm::radians(180.f), 0)) * glm::vec3(0,1,0);
     transform->position = -fpscam->getPos() + glm::vec3(glm::vec4(point, 1.f) * rotationMatrix);
 }

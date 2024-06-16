@@ -6,6 +6,7 @@
 struct Mesh : public Component {
 	std::shared_ptr<tigl::VBO> drawable; //TODO make this a unique ptr??
     Material objMaterial;
+    glm::vec3 colour {};
 
 	Mesh() {
 		std::cout << "Mesh has been created!" << std::endl;
@@ -25,4 +26,7 @@ struct Mesh : public Component {
 	void setMesh(const std::shared_ptr<tigl::VBO>& vbo) {
 		this->drawable = vbo;
 	}
+    inline void setColour(const glm::vec3& colour) {
+        this->colour = colour;
+    }
 };

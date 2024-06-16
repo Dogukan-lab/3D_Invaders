@@ -29,12 +29,16 @@ struct IndexedVertex {
 class ObjectLoader {
 public:
     ObjectLoader() = default;
-    explicit ObjectLoader(const char* filePath);
 
+    void loadObject(const char* filePath, const char* objectName);
     void parseMaterial(const std::string& fileName);
-    std::shared_ptr<tigl::VBO> createVBO();
+    void createVBO();
 
     void printMaterials();
+
+    inline std::weak_ptr<tigl::VBO> getVBO(const char* name) {
+        return models[name];
+    }
 
     Material& getMaterial(const std::string& mat);
 
@@ -45,6 +49,7 @@ private:
     std::vector<glm::vec3> normals{};
     std::vector<Face> faces {};
     std::unordered_map<std::string, Material> materials {};
+    std::unordered_map<std::string, std::shared_ptr<tigl::VBO>> models{};
 private:
     //Helper functions to make it more readable.
     void parseVertex(std::istringstream& stringStream);
