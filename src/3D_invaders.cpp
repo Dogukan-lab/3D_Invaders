@@ -58,7 +58,7 @@ int main() {
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    glfwWindow = glfwCreateWindow(windowWidth, windowHeight, "Why are you reading this", nullptr, nullptr);
+    glfwWindow = glfwCreateWindow(windowWidth, windowHeight, "3D Invaders", nullptr, nullptr);
     if (!glfwWindow) {
         glfwTerminate();
         return -1;
