@@ -27,7 +27,6 @@ std::unique_ptr<FPSCam> fpscam;
 std::shared_ptr<Coordinator> ecsCoordinator;
 std::unique_ptr<ObjectLoader> objLoader;
 
-std::shared_ptr<tigl::VBO> vbo;
 std::shared_ptr<tigl::VBO> worldPlane;
 
 glm::vec3 rotation(0.f);
@@ -88,7 +87,7 @@ int main() {
         glfwPollEvents();
     }
 
-//    decompose();
+    decompose();
     return 0;
 
 
@@ -113,65 +112,80 @@ void setupTerrain() {
 
     worldPlane.reset(tigl::createVbo(triangleVertices));
     const auto &planeEntity = ecsCoordinator->createEntity();
-    const auto& planeMesh = ecsCoordinator->addComponent<Mesh>(planeEntity);
+    const auto &planeMesh = ecsCoordinator->addComponent<Mesh>(planeEntity);
     planeMesh->drawable = worldPlane;
     planeMesh->colour = glm::vec3(1.f);
-    ecsCoordinator->addComponent<Transform>(planeEntity)->position = glm::vec3(0.f,0.f,0.f);
+    ecsCoordinator->addComponent<Transform>(planeEntity)->position = glm::vec3(0.f, 0.f, 0.f);
 
     //Sun
-    const auto& sunEntity = ecsCoordinator->createEntity();
-    const auto& sunTransform = ecsCoordinator->addComponent<Transform>(sunEntity);
-    const auto& sunMesh = ecsCoordinator->addComponent<Mesh>(sunEntity);
-    const auto& sunTexture = ecsCoordinator->addComponent<TextureComponent>(sunEntity);
-    const auto& sunLight = ecsCoordinator->addComponent<LightComponent>(sunEntity);
-
+    const auto &sunEntity = ecsCoordinator->createEntity();
+    const auto &sunTransform = ecsCoordinator->addComponent<Transform>(sunEntity);
+    const auto &sunMesh = ecsCoordinator->addComponent<Mesh>(sunEntity);
+    const auto &sunTexture = ecsCoordinator->addComponent<TextureComponent>(sunEntity);
+    const auto &sunLight = ecsCoordinator->addComponent<LightComponent>(sunEntity);
     sunTransform->position = glm::vec3(0.f);
     sunTransform->scale = glm::vec3(1.f);
     sunMesh->drawable = objLoader->getVBO("sun").lock();
-    sunTexture->loadTexture(objLoader->getMaterial("moon").map_Kd);
+    sunTexture->loadTexture(objLoader->getMaterial("sun").map_Kd);
     sunLight->position = sunTransform->position;
     tigl::shader->setLightDirectional(0, true);
 
     //Asteroid(s)
-    const auto& asteroidEntity1 = ecsCoordinator->createEntity();
-    const auto& asteroidTransform1 = ecsCoordinator->addComponent<Transform>(asteroidEntity1);
-    const auto& asteroidMesh1 = ecsCoordinator->addComponent<Mesh>(asteroidEntity1);
-    const auto& asteroidTexture1 = ecsCoordinator->addComponent<TextureComponent>(asteroidEntity1);
-    asteroidTransform1->position = sunTransform->position + glm::vec3(0,0, -2);
+    const auto &asteroidEntity1 = ecsCoordinator->createEntity();
+    const auto &asteroidTransform1 = ecsCoordinator->addComponent<Transform>(asteroidEntity1);
+    const auto &asteroidMesh1 = ecsCoordinator->addComponent<Mesh>(asteroidEntity1);
+    const auto &asteroidTexture1 = ecsCoordinator->addComponent<TextureComponent>(asteroidEntity1);
+    asteroidTransform1->position = sunTransform->position + glm::vec3(0, 0, -2);
     asteroidTransform1->scale = glm::vec3(0.1f);
     asteroidMesh1->drawable = objLoader->getVBO("asteroid").lock();
     asteroidTexture1->loadTexture(objLoader->getMaterial("asteroid_mat").map_Kd);
 
-    const auto& asteroidEntity2 = ecsCoordinator->createEntity();
-    const auto& asteroidTransform2 = ecsCoordinator->addComponent<Transform>(asteroidEntity2);
-    const auto& asteroidMesh2 = ecsCoordinator->addComponent<Mesh>(asteroidEntity2);
-    const auto& asteroidTexture2 = ecsCoordinator->addComponent<TextureComponent>(asteroidEntity2);
-    asteroidTransform2->position = sunTransform->position + glm::vec3(0,0, -2);
+    const auto &asteroidEntity2 = ecsCoordinator->createEntity();
+    const auto &asteroidTransform2 = ecsCoordinator->addComponent<Transform>(asteroidEntity2);
+    const auto &asteroidMesh2 = ecsCoordinator->addComponent<Mesh>(asteroidEntity2);
+    const auto &asteroidTexture2 = ecsCoordinator->addComponent<TextureComponent>(asteroidEntity2);
+    asteroidTransform2->position = sunTransform->position + glm::vec3(0, 0, -2);
     asteroidTransform2->scale = glm::vec3(0.1f);
     asteroidMesh2->drawable = objLoader->getVBO("asteroid").lock();
     asteroidTexture2->loadTexture(objLoader->getMaterial("asteroid_mat").map_Kd);
 
-    const auto& asteroidEntity3 = ecsCoordinator->createEntity();
-    const auto& asteroidTransform3 = ecsCoordinator->addComponent<Transform>(asteroidEntity3);
-    const auto& asteroidMesh3 = ecsCoordinator->addComponent<Mesh>(asteroidEntity3);
-    const auto& asteroidTexture3 = ecsCoordinator->addComponent<TextureComponent>(asteroidEntity3);
-    asteroidTransform3->position = sunTransform->position + glm::vec3(0,0, -2);
+    const auto &asteroidEntity3 = ecsCoordinator->createEntity();
+    const auto &asteroidTransform3 = ecsCoordinator->addComponent<Transform>(asteroidEntity3);
+    const auto &asteroidMesh3 = ecsCoordinator->addComponent<Mesh>(asteroidEntity3);
+    const auto &asteroidTexture3 = ecsCoordinator->addComponent<TextureComponent>(asteroidEntity3);
+    asteroidTransform3->position = sunTransform->position + glm::vec3(0, 0, -2);
     asteroidTransform3->scale = glm::vec3(0.1f);
     asteroidMesh3->drawable = objLoader->getVBO("asteroid").lock();
     asteroidTexture3->loadTexture(objLoader->getMaterial("asteroid_mat").map_Kd);
+
+    //Neptunus
+    const auto &neptuneEntity = ecsCoordinator->createEntity();
+    const auto &neptuneTransform = ecsCoordinator->addComponent<Transform>(neptuneEntity);
+    const auto &neptuneMesh = ecsCoordinator->addComponent<Mesh>(neptuneEntity);
+    const auto &neptuneTexture = ecsCoordinator->addComponent<TextureComponent>(neptuneEntity);
+    neptuneTransform->position = glm::vec3(-2.f, 2.f, 8.f);
+    neptuneMesh->drawable = objLoader->getVBO("neptunus").lock();
+    neptuneTexture->loadTexture(objLoader->getMaterial("neptune").map_Kd);
+
+    //Mars
+    const auto &marsEntity = ecsCoordinator->createEntity();
+    const auto &marsTransform = ecsCoordinator->addComponent<Transform>(marsEntity);
+    const auto &marsMesh = ecsCoordinator->addComponent<Mesh>(marsEntity);
+    const auto &marsTexture = ecsCoordinator->addComponent<TextureComponent>(marsEntity);
+    marsTransform->position = glm::vec3(-5.f, -3.f, 15.f);
+    marsMesh->drawable = objLoader->getVBO("mars").lock();
+    marsTexture->loadTexture(objLoader->getMaterial("mars_shader").map_Kd);
 }
 
 void setupShip(const std::weak_ptr<tigl::VBO> &vbo) {
     const auto &shipEntity = ecsCoordinator->createEntity();
     //Setup ship stuff
     const auto &transform = ecsCoordinator->addComponent<Transform>(shipEntity);
+    const auto &mesh = ecsCoordinator->addComponent<Mesh>(shipEntity);
+    const auto &textureComp = ecsCoordinator->addComponent<TextureComponent>(shipEntity);
     transform->scale = glm::vec3(0.1f);
     transform->rotation = fpscam->getRotation();
-    const auto &mesh = ecsCoordinator->addComponent<Mesh>(shipEntity);
     mesh->drawable = vbo.lock();
-//    mesh->colour = glm::vec3(0, 0, 1.f);
-//    ecsCoordinator->addComponent<LightComponent>(shipEntity)->position = fpscam->getPos();
-    const auto& textureComp = ecsCoordinator->addComponent<TextureComponent>(shipEntity);
     textureComp->loadTexture(objLoader->getMaterial("spaceship").map_Kd);
 }
 
@@ -184,10 +198,10 @@ void init() {
         if (key == GLFW_KEY_ESCAPE)
             glfwSetWindowShouldClose(window, 1);
     });
-//Shader settings
+
+    //Shader settings
     tigl::shader->enableLighting(true);
     tigl::shader->setLightCount(1);
-    tigl::shader->setShinyness(10.f);
 
     //Camera Light
     tigl::shader->setLightDirectional(0, false);
@@ -198,11 +212,13 @@ void init() {
     ecsCoordinator = std::make_unique<Coordinator>();
     ecsCoordinator->registerSystem<RenderSystem>();
     fpscam = std::make_unique<FPSCam>(glfwWindow);
-    fpscam->setPosition(glm::vec3(0.f));
+    fpscam->setPosition(glm::vec3(10.f, 5.f, -10.f));
     objLoader = std::make_unique<ObjectLoader>();
     objLoader->loadObject("../resources/spaceship/lowpoly_spaceship.obj", "ship");
     objLoader->loadObject("../resources/spaceship/asteroid.obj", "asteroid");
     objLoader->loadObject("../resources/spaceship/sun.obj", "sun");
+    objLoader->loadObject("../resources/spaceship/neptune.obj", "neptunus");
+    objLoader->loadObject("../resources/spaceship/mars_planet.obj", "mars");
     setupShip(objLoader->getVBO("ship"));
     setupTerrain();
 }
@@ -213,31 +229,8 @@ void printEntity(const std::weak_ptr<Entity> &entity) {
         return;
     std::cout << "Entity ID: " << entity.lock()->entityID << std::endl;
 
-    /* auto transform = entity->getComponent<Transform>();
-     if (!transform)
-         return;*/
-
     std::cout << "Entity Signature: " << entity.lock()->getSig().to_string() << std::endl;
-
-    //Transform debug code
-//    std::cout << "Transform Position: " << glm::to_string(transform->position) << std::endl;
-//    std::cout << "Transform Rotation: " << glm::to_string(transform->rotation) << std::endl;
-//    std::cout << "Transform Scale: " << glm::to_string(transform->scale) << std::endl;
-//    std::cout << "Component entity ref ID: " << transform->entityRef->entityID << std::endl;
-//    std::cout << "Entity ID from Mesh: " << entity->getComponent<Mesh>() << std::endl;
-
-    std::cout << "\n";
 }
-
-void stressTest(std::shared_ptr<tigl::VBO> vbo) {
-    for (int i = 0; i < types::MAX_ENTITIES; i++) {
-        auto entity = ecsCoordinator->createEntity();
-    }
-
-    ecsCoordinator->getEntity(2)->addComponent<Mesh>()->setMesh(vbo);
-    printEntity(ecsCoordinator->getEntity(2));
-}
-
 
 double lastTime = 0.0;
 double applicationTime;
@@ -245,7 +238,11 @@ constexpr double asteroidFlyingRadius = 2.f;
 constexpr double timeStep = 0.005;
 bool frameIsStatic = false;
 
-
+void asteroidRotation(const std::shared_ptr<Entity> &asteroid, const double &asteroidRadius, const double &constant) {
+    const auto &asteroidTransform = asteroid->getComponent<Transform>();
+    asteroidTransform->position = glm::vec3(glm::cos(applicationTime + constant) * asteroidRadius, 0,
+                                            sin(applicationTime + constant) * asteroidRadius);
+}
 
 //TODO Maak een eigen Camera systeem :)
 void update() {
@@ -253,7 +250,6 @@ void update() {
     auto deltaTime = float(currentFrame - lastTime);
     lastTime = currentFrame;
     applicationTime += timeStep;
-
 
     if (glfwGetKey(glfwWindow, GLFW_KEY_LEFT_ALT)) {
         frameIsStatic = !frameIsStatic;
@@ -271,24 +267,25 @@ void update() {
     shipTransform->position = -fpscam->getPos() + glm::vec3(glm::vec4(point, 1.f) * rotationMatrix);
 
     //Sun position
-    const auto& sun = ecsCoordinator->getEntity(2);
-    const auto& sunTransform = sun->getComponent<Transform>();
-    const auto& light = sun->getComponent<LightComponent>();
+    const auto &sun = ecsCoordinator->getEntity(2);
+    const auto &sunTransform = sun->getComponent<Transform>();
+    const auto &light = sun->getComponent<LightComponent>();
     float distance = glm::distance(shipTransform->position, sunTransform->position);
-    light->position = glm::vec3(distance/2.f);
+    light->position = glm::vec3(distance / 2.f);
+
+    const auto &neptune = ecsCoordinator->getEntity(6);
+    const auto &neptuneTransform = neptune->getComponent<Transform>();
+    neptuneTransform->rotation.y += deltaTime;
 
     //Asteroid ordnance.
-    const auto& asteroid1 = ecsCoordinator->getEntity(3);
-    const auto& asteroid1Transform = asteroid1->getComponent<Transform>();
-    asteroid1Transform->position = glm::vec3(glm::cos(applicationTime)*asteroidFlyingRadius, 0, sin(applicationTime)*asteroidFlyingRadius);
+    const auto &asteroid1 = ecsCoordinator->getEntity(3);
+    asteroidRotation(asteroid1, asteroidFlyingRadius, 1.0);
     //Asteroid ordnance.
-    const auto& asteroid2 = ecsCoordinator->getEntity(4);
-    const auto& asteroid2Transform = asteroid2->getComponent<Transform>();
-    asteroid2Transform->position = glm::vec3(glm::cos(applicationTime + 3.f)*asteroidFlyingRadius, 0, sin(applicationTime + 3.f)*asteroidFlyingRadius);
+    const auto &asteroid2 = ecsCoordinator->getEntity(4);
+    asteroidRotation(asteroid2, asteroidFlyingRadius, 3.0);
     //Asteroid ordnance.
-    const auto& asteroid3 = ecsCoordinator->getEntity(5);
-    const auto& asteroid3Transform = asteroid3->getComponent<Transform>();
-    asteroid3Transform->position = glm::vec3(glm::cos(applicationTime + 5.f)*asteroidFlyingRadius, 0, sin(applicationTime + 5.f)*asteroidFlyingRadius);
+    const auto &asteroid3 = ecsCoordinator->getEntity(5);
+    asteroidRotation(asteroid3, asteroidFlyingRadius, 6.0);
 }
 
 
@@ -303,7 +300,6 @@ void draw() {
             glm::perspective(glm::radians(75.0f), viewport[2] / (float) viewport[3], 0.01f, 100.f)
     );
     tigl::shader->setViewMatrix(fpscam->getMatrix());
-    tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

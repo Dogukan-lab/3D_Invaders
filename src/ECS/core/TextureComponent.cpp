@@ -8,7 +8,6 @@ void TextureComponent::loadTexture(const std::string& texturePath)
     texPath = texturePath;
     stbi_set_flip_vertically_on_load(1);
     int width, height, BPP;
-    std::cout << "TEX PATH: " << texturePath << std::endl;
     unsigned char* buffer = stbi_load(texturePath.c_str(), &width, &height, &BPP, 4);
     if (buffer == nullptr)
     {
@@ -36,7 +35,6 @@ void TextureComponent::loadTexture(const std::string& texturePath)
 
 void TextureComponent::bindTexture() const
 {
-//    std::cout << "TEX PATH BIND " << texPath << std::endl;
     glBindTexture(GL_TEXTURE_2D, this->textureID);
 }
 void TextureComponent::unbindTexture() const {
