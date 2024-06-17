@@ -133,14 +133,32 @@ void setupTerrain() {
     tigl::shader->setLightDirectional(0, true);
 
     //Asteroid(s)
-    const auto& asteroidEntity = ecsCoordinator->createEntity();
-    const auto& asteroidTransform = ecsCoordinator->addComponent<Transform>(asteroidEntity);
-    const auto& asteroidMesh = ecsCoordinator->addComponent<Mesh>(asteroidEntity);
-    const auto& asteroidTexture = ecsCoordinator->addComponent<TextureComponent>(asteroidEntity);
-    asteroidTransform->position = sunTransform->position + glm::vec3(0,0, -2);
-    asteroidTransform->scale = glm::vec3(0.1f);
-    asteroidMesh->drawable = objLoader->getVBO("asteroid").lock();
-    asteroidTexture->loadTexture(objLoader->getMaterial("asteroid_mat").map_Kd);
+    const auto& asteroidEntity1 = ecsCoordinator->createEntity();
+    const auto& asteroidTransform1 = ecsCoordinator->addComponent<Transform>(asteroidEntity1);
+    const auto& asteroidMesh1 = ecsCoordinator->addComponent<Mesh>(asteroidEntity1);
+    const auto& asteroidTexture1 = ecsCoordinator->addComponent<TextureComponent>(asteroidEntity1);
+    asteroidTransform1->position = sunTransform->position + glm::vec3(0,0, -2);
+    asteroidTransform1->scale = glm::vec3(0.1f);
+    asteroidMesh1->drawable = objLoader->getVBO("asteroid").lock();
+    asteroidTexture1->loadTexture(objLoader->getMaterial("asteroid_mat").map_Kd);
+
+    const auto& asteroidEntity2 = ecsCoordinator->createEntity();
+    const auto& asteroidTransform2 = ecsCoordinator->addComponent<Transform>(asteroidEntity2);
+    const auto& asteroidMesh2 = ecsCoordinator->addComponent<Mesh>(asteroidEntity2);
+    const auto& asteroidTexture2 = ecsCoordinator->addComponent<TextureComponent>(asteroidEntity2);
+    asteroidTransform2->position = sunTransform->position + glm::vec3(0,0, -2);
+    asteroidTransform2->scale = glm::vec3(0.1f);
+    asteroidMesh2->drawable = objLoader->getVBO("asteroid").lock();
+    asteroidTexture2->loadTexture(objLoader->getMaterial("asteroid_mat").map_Kd);
+
+    const auto& asteroidEntity3 = ecsCoordinator->createEntity();
+    const auto& asteroidTransform3 = ecsCoordinator->addComponent<Transform>(asteroidEntity3);
+    const auto& asteroidMesh3 = ecsCoordinator->addComponent<Mesh>(asteroidEntity3);
+    const auto& asteroidTexture3 = ecsCoordinator->addComponent<TextureComponent>(asteroidEntity3);
+    asteroidTransform3->position = sunTransform->position + glm::vec3(0,0, -2);
+    asteroidTransform3->scale = glm::vec3(0.1f);
+    asteroidMesh3->drawable = objLoader->getVBO("asteroid").lock();
+    asteroidTexture3->loadTexture(objLoader->getMaterial("asteroid_mat").map_Kd);
 }
 
 void setupShip(const std::weak_ptr<tigl::VBO> &vbo) {
@@ -227,6 +245,8 @@ constexpr double asteroidFlyingRadius = 2.f;
 constexpr double timeStep = 0.005;
 bool frameIsStatic = false;
 
+
+
 //TODO Maak een eigen Camera systeem :)
 void update() {
     double currentFrame = glfwGetTime();
@@ -261,6 +281,14 @@ void update() {
     const auto& asteroid1 = ecsCoordinator->getEntity(3);
     const auto& asteroid1Transform = asteroid1->getComponent<Transform>();
     asteroid1Transform->position = glm::vec3(glm::cos(applicationTime)*asteroidFlyingRadius, 0, sin(applicationTime)*asteroidFlyingRadius);
+    //Asteroid ordnance.
+    const auto& asteroid2 = ecsCoordinator->getEntity(4);
+    const auto& asteroid2Transform = asteroid2->getComponent<Transform>();
+    asteroid2Transform->position = glm::vec3(glm::cos(applicationTime + 3.f)*asteroidFlyingRadius, 0, sin(applicationTime + 3.f)*asteroidFlyingRadius);
+    //Asteroid ordnance.
+    const auto& asteroid3 = ecsCoordinator->getEntity(5);
+    const auto& asteroid3Transform = asteroid3->getComponent<Transform>();
+    asteroid3Transform->position = glm::vec3(glm::cos(applicationTime + 5.f)*asteroidFlyingRadius, 0, sin(applicationTime + 5.f)*asteroidFlyingRadius);
 }
 
 
@@ -268,7 +296,7 @@ void draw() {
     glViewport(0, 0, windowWidth, windowHeight);
     glGetIntegerv(GL_VIEWPORT, viewport);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
+    glClearColor(0.05f, 0.1f, 0.2f, 1.0f);
 
     //Camera setup before drawing.
     tigl::shader->setProjectionMatrix(
