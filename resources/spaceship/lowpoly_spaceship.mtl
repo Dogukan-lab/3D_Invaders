@@ -1,7 +1,7 @@
 # Blender 4.0.2 MTL File: 'Sketchfab_2015_09_29_19_40_53.blend.blend'
 # www.blender.org
 
-newmtl Material.001
+newmtl spaceship
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000

@@ -40,6 +40,7 @@ void RenderSystem::draw()
 		}
         if(light) {
             tigl::shader->setLightPosition(0, light->position);
+            tigl::shader->setShinyness(3000000000.f);
         }
         modelM = glm::translate(modelM, transform->position);
 		modelM = glm::rotate(modelM, transform->rotation.z, glm::vec3(0, 0, 1));

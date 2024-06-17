@@ -18,6 +18,11 @@ void ObjectLoader::loadObject(const char *filePath, const char* objectName) {
     //Parse object in this
     currentObj = objectName;
     models[currentObj] = nullptr;
+    vertices.clear();
+    texCoords.clear();
+    normals.clear();
+    faces.clear();
+
     std::ifstream file(filePath);
     if (!file.is_open())
         std::cerr << "Couldn't open or find file!" << std::endl;
@@ -57,6 +62,7 @@ void ObjectLoader::loadObject(const char *filePath, const char* objectName) {
         }
     }
     createVBO();
+    line.clear();
     currentObj.clear();
     file.close();
 }
@@ -120,13 +126,7 @@ void ObjectLoader::parseMaterial(const std::string &fileName) {
     if (!material.name.empty()) {
         materials[material.name] = material;
     }
-    //Debug code for reading the parsed material.
-//    for(const auto& matpair : materials) {
-//        std::stringstream stringStream;
-//        const auto& mat = matpair.second;
-//        stringStream << mat;
-//        std::cout << stringStream.str();
-//    }
+
     materialFile.close();
 }
 
@@ -152,11 +152,6 @@ void ObjectLoader::parseFace(std::istringstream &stringStream) {
         params.push_back(faceData);
     }
 
-//    for(const auto& data: params) {
-//        std::cout << data << "\t";
-//    }
-//    std::cout << std::endl;
-
     for (size_t ii = 3; ii <= params.size(); ii++) {
         Face face;
         for (size_t i = ii - 3; i < ii; i++) {
@@ -173,11 +168,6 @@ void ObjectLoader::parseFace(std::istringstream &stringStream) {
         }
         this->faces.push_back(face);
     }
-
-//    for(const auto& data : params) {
-//        std::cout << "Face data: " <<  data << "\n";
-//    }
-
 }
 
 
