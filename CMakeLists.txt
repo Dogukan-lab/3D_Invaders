@@ -59,7 +59,6 @@ add_executable (${PROJECT_NAME} "src/3D_invaders.cpp"
         "src/ECS/core/Coordinator.h"
         "src/ECS/core/LightComponent.h"
         "src/ECS/core/TextureComponent.cpp"
-        "src/modelLoader/ModelLoader.cpp"
         "UnitTests/ECSTest.cpp"
         "UnitTests/UnitTester.cpp"
         src/modelLoader/ObjectLoader.cpp src/modelLoader/ObjectLoader.h src/ECS/core/Material.h)

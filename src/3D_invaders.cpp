@@ -13,12 +13,10 @@
 #include "ECS/core/LightComponent.h"
 #include "ECS/core/TextureComponent.h"
 #include "ECS/systems/RenderSystem.h"
-#include "modelLoader/ModelLoader.h"
 #include "UnitTester.h"
 #include "modelLoader/ObjectLoader.h"
 
 #define TESTING 0
-#define OBJLOADER 0
 
 //TODO Refactor these raw pointers!
 GLFWwindow *glfwWindow;
@@ -47,10 +45,6 @@ void decompose();
 int main() {
 #if TESTING
     return UnitTester::startTests();
-#endif
-#if OBJLOADER
-    testObjLoader();
-    return 0;
 #endif
 
     /* Initialize the library */
